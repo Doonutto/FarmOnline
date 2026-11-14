@@ -2,459 +2,2130 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demonz-Hunter Online</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aetheria Online - อาณาจักรเอเธอร์เรีย MMORPG Multiplayer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #0b0c10; color: #c5c6c7; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; user-select: none; }
-        
-        #ui-container { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; }
-        .interactive { pointer-events: auto; }
-        
-        /* Screens */
-        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, #1f2833 0%, #0b0c10 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; }
-        .panel { background: rgba(31, 40, 51, 0.95); border: 2px solid #66fcf1; border-radius: 12px; padding: 25px; width: 440px; box-shadow: 0 0 25px rgba(102, 252, 241, 0.3); text-align: center; }
-        h1 { color: #66fcf1; font-size: 26px; margin-bottom: 15px; text-shadow: 0 0 10px rgba(102,252,241,0.5); letter-spacing: 2px; }
-        
-        .form-group { margin-bottom: 12px; text-align: left; }
-        label { display: block; font-size: 12px; color: #45a29e; margin-bottom: 4px; font-weight: bold; }
-        input[type="text"], select { width: 100%; padding: 8px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 6px; font-size: 14px; }
-        
-        .color-picker-row { display: flex; gap: 10px; align-items: center; }
-        input[type="color"] { -webkit-appearance: none; border: none; width: 36px; height: 36px; border-radius: 6px; cursor: pointer; background: none; }
-        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-        input[type="color"]::-webkit-color-swatch { border: 1px solid #45a29e; border-radius: 6px; }
-
-        .btn { background: #66fcf1; color: #0b0c10; font-weight: bold; padding: 10px; width: 100%; border: none; border-radius: 6px; font-size: 15px; cursor: pointer; transition: 0.2s; margin-top: 8px; box-shadow: 0 0 10px rgba(102,252,241,0.4); }
-        .btn:hover { background: #45a29e; color: #fff; transform: translateY(-2px); }
-
-        /* HUD */
-        #hud { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; pointer-events: none; }
-        .hud-top { display: flex; justify-content: space-between; width: 100%; padding: 15px; }
-        .player-status { background: rgba(11, 12, 16, 0.85); border: 1px solid #45a29e; padding: 12px; border-radius: 8px; width: 250px; pointer-events: auto; }
-        .bar-container { background: #1f2833; height: 12px; border-radius: 6px; overflow: hidden; margin-top: 6px; border: 1px solid #45a29e; }
-        #hp-bar { background: #e74c3c; height: 100%; width: 100%; transition: width 0.3s; }
-
-        /* Minimap */
-        #minimap-box { background: rgba(11, 12, 16, 0.85); border: 1px solid #45a29e; border-radius: 8px; width: 160px; height: 160px; position: relative; overflow: hidden; pointer-events: auto; }
-        #minimapCanvas { width: 100%; height: 100%; }
-
-        /* Chat */
-        #chat-box { position: absolute; bottom: 20px; left: 20px; width: 320px; background: rgba(11, 12, 16, 0.85); border: 1px solid #45a29e; border-radius: 8px; padding: 10px; pointer-events: auto; display: flex; flex-direction: column; }
-        #chat-messages { height: 120px; overflow-y: auto; font-size: 12px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 4px; word-break: break-all; }
-        .chat-msg { background: rgba(255,255,255,0.05); padding: 3px 6px; border-radius: 4px; }
-        #chat-input { background: #0b0c10; border: 1px solid #45a29e; color: #fff; padding: 6px; border-radius: 4px; font-size: 12px; }
-
-        /* Controls */
-        #controls-hint { position: absolute; bottom: 20px; right: 20px; background: rgba(11, 12, 16, 0.85); border: 1px solid #45a29e; padding: 10px 15px; border-radius: 8px; font-size: 12px; text-align: right; pointer-events: auto; }
-
-        canvas { display: block; }
+        * {
+            font-family: 'Kanit', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            box-sizing: border-box;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #090d16;
+            overflow: hidden;
+            touch-action: none;
+        }
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(245, 158, 11, 0.6);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(245, 158, 11, 0.95);
+        }
+        .fantasy-panel {
+            background: linear-gradient(145deg, rgba(22, 33, 54, 0.92), rgba(11, 17, 30, 0.96));
+            border: 1px solid rgba(245, 158, 11, 0.45);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(8px);
+        }
+        .fantasy-btn {
+            background: linear-gradient(180deg, #f59e0b 0%, #b45309 100%);
+            border: 1px solid #fde68a;
+            box-shadow: 0 4px 12px rgba(180, 83, 9, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+            transition: all 0.15s ease;
+        }
+        .fantasy-btn:hover:not(:disabled) {
+            filter: brightness(1.12);
+            transform: translateY(-1px);
+        }
+        .fantasy-btn:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+        .fantasy-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 18px rgba(245, 158, 11, 0.25); }
+            50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.65); }
+        }
+        .glow-border {
+            animation: pulseGlow 3.2s infinite;
+        }
     </style>
 </head>
-<body>
+<body class="text-slate-100 relative">
 
-    <!-- หน้าสร้างตัวละคร -->
-    <div id="create-screen" class="screen">
-        <div class="panel interactive">
-            <h1>DEMONZ-HUNTER</h1>
-            <div class="form-group">
-                <label>ชื่อนักล่า (Hunter Name)</label>
-                <input type="text" id="input-name" value="ShadowHunter" maxlength="12">
+    <!-- ==================== 1. CHARACTER CREATION SCREEN ==================== -->
+    <div id="creation-screen" class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-800 via-slate-950 to-black overflow-y-auto">
+        <div class="fantasy-panel rounded-2xl w-full max-w-5xl p-4 sm:p-6 my-auto flex flex-col gap-4 glow-border">
+            <!-- Header -->
+            <div class="flex flex-col sm:flex-row justify-between items-center border-b border-amber-500/30 pb-3 gap-2">
+                <div class="text-center sm:text-left">
+                    <h1 class="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-400 to-amber-500">
+                        ⚔️ อาณาจักรเอเธอร์เรีย (Aetheria Online)
+                    </h1>
+                    <p class="text-xs sm:text-sm text-slate-400">สร้างตัวละครในแบบของคุณและออกผจญภัยในโลก MMORPG แฟนตาซี (ระบบ Multiplayer)</p>
+                </div>
+                <button id="btn-load-save" type="button" class="hidden px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-lg border border-emerald-300/60 transition flex items-center gap-2 cursor-pointer">
+                    <span>▶️ เล่นต่อจากเซฟเดิม</span>
+                    <span id="save-info-badge" class="text-xs bg-emerald-950/80 px-2 py-0.5 rounded-lg"></span>
+                </button>
             </div>
-            <div class="form-group">
-                <label>คลาสอาชีพ (Class)</label>
-                <select id="input-class">
-                    <option value="BladeMaster">🗡️ Blade Master (นักดาบคลั่ง)</option>
-                    <option value="SoulWeaver">🔮 Soul Weaver (จอมเวทวิญญาณ)</option>
-                    <option value="ShadowArcher">🏹 Shadow Archer (พลธนูเงา)</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>สีชุดเกราะนักล่า (Armor Color)</label>
-                <div class="color-picker-row">
-                    <input type="color" id="input-color" value="#66fcf1">
-                    <span style="font-size: 13px; color: #c5c6c7;">เลือกสีประจำตัวของคุณ</span>
+
+            <!-- Main Content Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
+                
+                <!-- Left Column: Live Preview & Base Stats (4 cols) -->
+                <div class="lg:col-span-4 flex flex-col items-center justify-between bg-slate-900/85 rounded-xl p-4 border border-slate-700/80">
+                    <div class="w-full text-center">
+                        <span class="text-xs uppercase tracking-wider text-amber-400 font-semibold">ตัวอย่างตัวละคร (Live Preview)</span>
+                        <div class="relative w-48 h-48 mx-auto my-2 rounded-2xl bg-gradient-to-b from-slate-800 via-slate-900 to-slate-950 border-2 border-amber-500/50 flex items-center justify-center shadow-inner overflow-hidden">
+                            <canvas id="preview-canvas" width="192" height="192"></canvas>
+                            <div class="absolute bottom-2 inset-x-2 flex justify-between px-1">
+                                <button id="btn-rotate-left" type="button" title="หมุนซ้าย" class="bg-slate-800/90 hover:bg-amber-600 text-xs px-2.5 py-1 rounded-lg border border-slate-600 transition cursor-pointer">↺ ซ้าย</button>
+                                <button id="btn-rotate-right" type="button" title="หมุนขวา" class="bg-slate-800/90 hover:bg-amber-600 text-xs px-2.5 py-1 rounded-lg border border-slate-600 transition cursor-pointer">ขวา ↻</button>
+                            </div>
+                        </div>
+                        <div id="preview-name-tag" class="text-base font-bold text-amber-300 truncate px-2">ผู้กล้าเอเธอร์เรีย</div>
+                        <div id="preview-class-tag" class="text-xs text-slate-400">Lv.1 นักรบ (Warrior)</div>
+                    </div>
+
+                    <!-- Base Stats Display -->
+                    <div class="w-full mt-3 bg-slate-950/75 rounded-xl p-3 border border-slate-800">
+                        <div class="text-xs font-semibold text-amber-400 mb-2 flex justify-between">
+                            <span>ค่าพลังเริ่มต้น</span>
+                            <span id="stat-role-badge" class="text-slate-400">สายแทงค์ / โจมตีใกล้</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1.5 text-xs">
+                            <div class="flex justify-between bg-slate-900 px-2.5 py-1.5 rounded-lg">
+                                <span class="text-rose-400 font-medium">❤️ HP</span>
+                                <span id="stat-hp" class="font-bold">180</span>
+                            </div>
+                            <div class="flex justify-between bg-slate-900 px-2.5 py-1.5 rounded-lg">
+                                <span class="text-sky-400 font-medium">💧 MP</span>
+                                <span id="stat-mp" class="font-bold">60</span>
+                            </div>
+                            <div class="flex justify-between bg-slate-900 px-2.5 py-1.5 rounded-lg">
+                                <span class="text-orange-400 font-medium">⚔️ STR</span>
+                                <span id="stat-str" class="font-bold">16</span>
+                            </div>
+                            <div class="flex justify-between bg-slate-900 px-2.5 py-1.5 rounded-lg">
+                                <span class="text-purple-400 font-medium">🔮 INT</span>
+                                <span id="stat-int" class="font-bold">6</span>
+                            </div>
+                            <div class="flex justify-between bg-slate-900 px-2.5 py-1.5 rounded-lg">
+                                <span class="text-emerald-400 font-medium">⚡ AGI</span>
+                                <span id="stat-agi" class="font-bold">9</span>
+                            </div>
+                            <div class="flex justify-between bg-slate-900 px-2.5 py-1.5 rounded-lg">
+                                <span class="text-amber-400 font-medium">🛡️ VIT</span>
+                                <span id="stat-vit" class="font-bold">14</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Name, Class, Appearance (8 cols) -->
+                <div class="lg:col-span-8 flex flex-col justify-between gap-3.5">
+                    
+                    <!-- Step 1: Character Name -->
+                    <div>
+                        <label class="block text-sm font-semibold text-amber-300 mb-1">1. ตั้งชื่อตัวละคร (Character Name)</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="input-char-name" maxlength="16" placeholder="พิมพ์ชื่อตัวละครของคุณ (2 - 16 ตัวอักษร)..." 
+                                class="flex-1 bg-slate-900/90 border border-slate-600 focus:border-amber-400 rounded-xl px-4 py-2 text-white outline-none text-sm select-text">
+                            <button id="btn-random-name" type="button" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded-xl text-xs font-medium transition cursor-pointer">🎲 สุ่มชื่อ</button>
+                        </div>
+                        <p id="name-error" class="text-rose-400 text-xs mt-1 hidden">⚠️ กรุณากรอกชื่อตัวละครอย่างน้อย 2 ตัวอักษร</p>
+                    </div>
+
+                    <!-- Step 2: Select Class -->
+                    <div>
+                        <label class="block text-sm font-semibold text-amber-300 mb-1.5">2. เลือกสายอาชีพ (Class)</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                            <!-- Warrior -->
+                            <button type="button" data-class="warrior" class="class-card active text-left p-3 rounded-xl border-2 border-amber-400 bg-amber-500/15 transition cursor-pointer">
+                                <div class="flex items-center gap-2 font-bold text-amber-300 text-sm">
+                                    <span class="text-xl">🛡️</span> นักรบ (Warrior)
+                                </div>
+                                <p class="text-[11px] text-slate-300 mt-1">พลังชีวิตสูง โจมตีประชิดและกวาดล้างศัตรู</p>
+                                <div class="text-[10px] text-amber-200/90 mt-1.5 bg-slate-950/70 p-1.5 rounded flex items-center justify-around">
+                                    <span>⚔️ คลื่นดาบ</span>
+                                    <span>🌪️ พายุหมุน</span>
+                                    <span>🔥 คำราม</span>
+                                </div>
+                            </button>
+                            <!-- Mage -->
+                            <button type="button" data-class="mage" class="class-card text-left p-3 rounded-xl border-2 border-slate-700 bg-slate-900/70 hover:border-slate-500 transition cursor-pointer">
+                                <div class="flex items-center gap-2 font-bold text-sky-300 text-sm">
+                                    <span class="text-xl">🔮</span> นักเวท (Mage)
+                                </div>
+                                <p class="text-[11px] text-slate-300 mt-1">โจมตีเวทมนตร์ระยะไกลเป็นวงกว้างสุดอลังการ</p>
+                                <div class="text-[10px] text-sky-200/90 mt-1.5 bg-slate-950/70 p-1.5 rounded flex items-center justify-around">
+                                    <span>🔥 ลูกไฟ</span>
+                                    <span>❄️ น้ำแข็ง</span>
+                                    <span>☄️ อุกกาบาต</span>
+                                </div>
+                            </button>
+                            <!-- Archer -->
+                            <button type="button" data-class="archer" class="class-card text-left p-3 rounded-xl border-2 border-slate-700 bg-slate-900/70 hover:border-slate-500 transition cursor-pointer">
+                                <div class="flex items-center gap-2 font-bold text-emerald-300 text-sm">
+                                    <span class="text-xl">🏹</span> นักธนู (Archer)
+                                </div>
+                                <p class="text-[11px] text-slate-300 mt-1">เคลื่อนที่รวดเร็ว ยิงธนูรัวและคริติคอลรุนแรง</p>
+                                <div class="text-[10px] text-emerald-200/90 mt-1.5 bg-slate-950/70 p-1.5 rounded flex items-center justify-around">
+                                    <span>🏹 ยิง 3 ดอก</span>
+                                    <span>💨 พุ่งหลบ</span>
+                                    <span>🌧️ ฝนธนู</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Appearance Customization -->
+                    <div class="bg-slate-900/65 p-3 rounded-xl border border-slate-700/80">
+                        <label class="block text-sm font-semibold text-amber-300 mb-2">3. ปรับแต่งรูปลักษณ์ (Appearance)</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                            <!-- Skin Color -->
+                            <div>
+                                <span class="text-slate-300 block mb-1">สีผิว (6 สี)</span>
+                                <div id="picker-skin" class="flex gap-1.5 flex-wrap"></div>
+                            </div>
+                            <!-- Hairstyle -->
+                            <div>
+                                <span class="text-slate-300 block mb-1">ทรงผม / หมวก (5 แบบ)</span>
+                                <div id="picker-hairstyle" class="flex gap-1.5 flex-wrap"></div>
+                            </div>
+                            <!-- Hair Color -->
+                            <div>
+                                <span class="text-slate-300 block mb-1">สีผม (8 สี)</span>
+                                <div id="picker-haircolor" class="flex gap-1.5 flex-wrap"></div>
+                            </div>
+                            <!-- Outfit Color -->
+                            <div>
+                                <span class="text-slate-300 block mb-1">สีชุดเกราะ (8 สี)</span>
+                                <div id="picker-outfit" class="flex gap-1.5 flex-wrap"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Start Button -->
+                    <button id="btn-start-game" type="button" class="fantasy-btn w-full py-3 rounded-xl font-bold text-slate-950 text-base sm:text-lg tracking-wide shadow-xl cursor-pointer">
+                        🚀 เข้าสู่โลกแห่งเอเธอร์เรียออนไลน์ (Firebase Multiplayer)
+                    </button>
                 </div>
             </div>
-            <button class="btn interactive" onclick="startOnlineGame()">เข้าสู่โลกนักล่าออนไลน์</button>
         </div>
     </div>
 
-    <!-- หน้าจอเกมหลัก -->
-    <div id="hud">
-        <div class="hud-top">
-            <div class="player-status">
-                <div style="font-weight: bold; color: #66fcf1; display: flex; justify-content: space-between;">
-                    <span id="hud-name">Hunter</span>
-                    <span id="hud-level" style="color: #f1c40f;">Lv.1</span>
+    <!-- ==================== 2. MAIN GAME WORLD SCREEN ==================== -->
+    <div id="game-screen" class="hidden fixed inset-0 w-full h-full">
+        <!-- Main 2D Game Canvas -->
+        <canvas id="game-canvas" tabindex="0" class="block w-full h-full cursor-crosshair outline-none"></canvas>
+
+        <!-- TOP-LEFT HUD: Player Status Bar + World Chat -->
+        <div class="fixed top-3 left-3 z-20 flex flex-col gap-2 w-64 sm:w-76 pointer-events-none">
+            <!-- Player Status Card -->
+            <div class="fantasy-panel rounded-2xl p-2.5 sm:p-3 pointer-events-auto">
+                <div class="flex items-center gap-2.5">
+                    <!-- Mini Avatar Portrait -->
+                    <div class="w-12 h-12 rounded-xl bg-slate-900 border border-amber-400/70 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                        <canvas id="hud-avatar-canvas" width="48" height="48"></canvas>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-1">
+                            <span id="hud-name" class="font-bold text-sm text-amber-300 truncate">Player</span>
+                            <span id="hud-level" class="text-xs bg-amber-500/25 text-amber-300 border border-amber-500/50 px-1.5 py-0.5 rounded font-bold flex-shrink-0">Lv.1</span>
+                        </div>
+                        <div class="flex items-center justify-between text-[11px] text-slate-300 mt-0.5">
+                            <span id="hud-class">นักรบ</span>
+                            <span class="text-yellow-400 font-semibold">💰 <span id="hud-gold">150</span> G</span>
+                        </div>
+                    </div>
                 </div>
-                <div style="font-size: 11px; color: #45a29e; margin-bottom: 4px;" id="hud-class">Blade Master</div>
-                <div style="font-size: 11px; display: flex; justify-content: space-between;"><span>HP</span><span id="hud-hp-text">100/100</span></div>
-                <div class="bar-container"><div id="hp-bar"></div></div>
-                <div style="margin-top: 6px; font-size: 11px; color: #f39c12;">ทอง: <span id="hud-gold">0</span> G | EXP: <span id="hud-exp">0</span></div>
+
+                <!-- Bars: HP, MP, EXP -->
+                <div class="mt-2 space-y-1.5 text-[10px] font-semibold">
+                    <!-- HP -->
+                    <div class="relative w-full h-3.5 bg-slate-950 rounded-full overflow-hidden border border-slate-700">
+                        <div id="bar-hp" class="h-full bg-gradient-to-r from-rose-600 to-red-500 transition-all duration-150" style="width: 100%"></div>
+                        <span id="text-hp" class="absolute inset-0 flex items-center justify-center text-white drop-shadow">180 / 180</span>
+                    </div>
+                    <!-- MP -->
+                    <div class="relative w-full h-3 bg-slate-950 rounded-full overflow-hidden border border-slate-700">
+                        <div id="bar-mp" class="h-full bg-gradient-to-r from-blue-600 to-sky-400 transition-all duration-150" style="width: 100%"></div>
+                        <span id="text-mp" class="absolute inset-0 flex items-center justify-center text-white drop-shadow">60 / 60</span>
+                    </div>
+                    <!-- EXP -->
+                    <div class="relative w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-700">
+                        <div id="bar-exp" class="h-full bg-gradient-to-r from-amber-500 to-yellow-300 transition-all duration-150" style="width: 0%"></div>
+                        <span id="text-exp" class="absolute inset-0 flex items-center justify-center text-[9px] text-slate-200 drop-shadow">EXP: 0 / 100</span>
+                    </div>
+                </div>
             </div>
-            <div id="minimap-box">
-                <canvas id="minimapCanvas" width="160" height="160"></canvas>
+
+            <!-- World Chat Box (Top-Left below status bar) -->
+            <div id="chat-container" class="fantasy-panel rounded-2xl w-full flex flex-col overflow-hidden pointer-events-auto hidden sm:flex">
+                <div class="bg-slate-900/90 px-3 py-1 border-b border-slate-700/80 flex justify-between items-center">
+                    <span class="text-[11px] font-bold text-amber-300">💬 แชทออนไลน์ Firebase</span>
+                    <span class="text-[10px] text-emerald-400 flex items-center gap-1">
+                        <span id="online-count-badge" class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Firebase Sync
+                    </span>
+                </div>
+                <div id="chat-messages" class="h-28 overflow-y-auto p-2 space-y-1 text-[11px] select-text">
+                    <div class="text-amber-300/90">[ระบบ] เชื่อมต่อ Firebase Realtime Database สำเร็จ!</div>
+                </div>
+                <form id="chat-form" class="flex border-t border-slate-700/80 bg-slate-950/85">
+                    <input type="text" id="chat-input" maxlength="80" placeholder="พิมพ์ข้อความคุยกับผู้เล่นอื่น..." 
+                        class="flex-1 bg-transparent px-2.5 py-1 text-xs text-white outline-none select-text">
+                    <button type="submit" class="px-2.5 py-1 bg-amber-600/85 hover:bg-amber-500 text-[11px] font-bold text-white transition cursor-pointer">ส่ง</button>
+                </form>
             </div>
         </div>
 
-        <div id="chat-box">
-            <div id="chat-messages"></div>
-            <input type="text" id="chat-input" placeholder="พิมพ์ข้อความคุยกับผู้เล่นอื่น..." onkeydown="handleChatInput(event)">
+        <!-- TOP-CENTER: Zone Banner & Active Quest Tracker -->
+        <div class="fixed top-3 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center pointer-events-none">
+            <div class="fantasy-panel px-4 py-1.5 rounded-full text-center">
+                <span id="hud-zone-name" class="text-xs sm:text-sm font-bold text-amber-300">🏰 เมืองเอเธอร์เรีย (Town Square)</span>
+            </div>
+            <div class="mt-1 px-3 py-0.5 rounded-full bg-slate-950/80 border border-slate-700/80 text-[10px] sm:text-[11px] text-slate-300 shadow hidden md:block">
+                เดิน: WASD / ลูกศร / คลิกบนพื้น | โจมตี: Space | คุย NPC: F
+            </div>
+            <!-- Active Quest Mini Box -->
+            <div id="hud-quest-box" class="mt-1.5 fantasy-panel px-3 py-1.5 rounded-xl text-xs max-w-xs text-center hidden pointer-events-auto">
+                <div class="text-amber-400 font-bold flex items-center justify-center gap-1">
+                    <span>📜 เควส:</span>
+                    <span id="hud-quest-title">กำจัดสไลม์เขียว</span>
+                </div>
+                <div id="hud-quest-progress" class="text-slate-200 text-[11px] mt-0.5">0 / 5 ตัว</div>
+            </div>
         </div>
 
-        <div id="controls-hint">
-            <b>WASD / ลูกศร</b> : เดิน<br>
-            <b>คลิกซ้าย</b> : โจมตีมอนสเตอร์ / เดิน<br>
-            <b>พื้นที่เมือง</b> : คุย NPC เควส/ร้านค้า
+        <!-- TOP-RIGHT: Minimap & Action Menu Buttons -->
+        <div class="fixed top-3 right-3 z-20 flex flex-col items-end gap-2">
+            <!-- Minimap -->
+            <div class="fantasy-panel p-1.5 rounded-2xl">
+                <canvas id="minimap-canvas" width="132" height="132" class="rounded-xl bg-slate-950 block"></canvas>
+                <div class="text-[9px] text-center text-slate-300 mt-1 flex justify-around">
+                    <span class="text-yellow-300">● คุณ</span>
+                    <span class="text-sky-400">● NPC</span>
+                    <span class="text-rose-400">● มอนเตอร์</span>
+                </div>
+            </div>
+            <!-- Action Menu Buttons -->
+            <div class="flex flex-wrap justify-end gap-1.5 max-w-[230px]">
+                <button id="btn-toggle-stats" type="button" class="fantasy-panel hover:border-amber-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1 transition relative cursor-pointer">
+                    <span>📊 สเตตัส</span>
+                    <span id="stat-point-badge" class="hidden w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+                </button>
+                <button id="btn-toggle-inv" type="button" class="fantasy-panel hover:border-amber-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1 transition cursor-pointer">
+                    <span>🎒 กระเป๋า</span>
+                </button>
+                <button id="btn-save-now" type="button" title="บันทึกเกมทันที" class="fantasy-panel hover:border-emerald-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-emerald-300 transition cursor-pointer">
+                    <span>💾 เซฟ</span>
+                </button>
+                <button id="btn-toggle-sound" type="button" title="เปิด/ปิดเสียงเอฟเฟกต์" class="fantasy-panel hover:border-amber-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer">
+                    <span>🔊</span>
+                </button>
+                <button id="btn-new-char" type="button" title="สร้างตัวละครใหม่ / รีเซ็ต" class="fantasy-panel hover:border-rose-400 px-2.5 py-1.5 rounded-xl text-xs font-semibold text-rose-300 transition cursor-pointer">
+                    <span>🔄 ตัวละครใหม่</span>
+                </button>
+            </div>
         </div>
+
+        <!-- NPC INTERACTION PROMPT BUTTON (Appears when near an NPC) -->
+        <button id="btn-interact-npc" type="button" class="hidden fixed bottom-24 left-1/2 -translate-x-1/2 z-30 fantasy-btn px-5 py-2 rounded-full font-bold text-slate-950 text-sm shadow-2xl flex items-center gap-2 animate-bounce cursor-pointer">
+            <span>💬 กด [F] เพื่อคุยกับ</span>
+            <span id="nearby-npc-name">NPC</span>
+        </button>
+
+        <!-- BOTTOM-CENTER: Skill Bar & Quick Potions -->
+        <div class="fixed bottom-3 left-1/2 -translate-x-1/2 z-20 fantasy-panel px-2.5 sm:px-3.5 py-2 rounded-2xl flex items-center gap-1.5 sm:gap-2.5">
+            <!-- Basic Attack -->
+            <button id="skill-btn-0" type="button" class="skill-slot relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-slate-900 border-2 border-slate-500 hover:border-amber-400 flex flex-col items-center justify-center transition active:scale-95 cursor-pointer">
+                <span id="skill-icon-0" class="text-xl sm:text-2xl">⚔️</span>
+                <span class="text-[9px] text-slate-300 font-bold">โจมตี</span>
+                <span class="absolute top-0.5 left-1 text-[8px] text-slate-400 font-mono">Space</span>
+            </button>
+            <!-- Skill 1 -->
+            <button id="skill-btn-1" type="button" class="skill-slot relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-slate-900 border-2 border-amber-500/75 hover:border-amber-300 flex flex-col items-center justify-center transition active:scale-95 overflow-hidden cursor-pointer">
+                <span id="skill-icon-1" class="text-xl sm:text-2xl">💥</span>
+                <span id="skill-name-1" class="text-[9px] text-amber-200 font-bold truncate w-full text-center px-0.5">สกิล 1</span>
+                <span class="absolute top-0.5 left-1 text-[9px] text-amber-400 font-mono font-bold">1</span>
+                <div id="skill-cd-1" class="hidden absolute inset-0 bg-slate-950/85 flex items-center justify-center text-sm font-bold text-white">0</div>
+            </button>
+            <!-- Skill 2 -->
+            <button id="skill-btn-2" type="button" class="skill-slot relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-slate-900 border-2 border-sky-500/75 hover:border-sky-300 flex flex-col items-center justify-center transition active:scale-95 overflow-hidden cursor-pointer">
+                <span id="skill-icon-2" class="text-xl sm:text-2xl">🌪️</span>
+                <span id="skill-name-2" class="text-[9px] text-sky-200 font-bold truncate w-full text-center px-0.5">สกิล 2</span>
+                <span class="absolute top-0.5 left-1 text-[9px] text-sky-400 font-mono font-bold">2</span>
+                <div id="skill-cd-2" class="hidden absolute inset-0 bg-slate-950/85 flex items-center justify-center text-sm font-bold text-white">0</div>
+            </button>
+            <!-- Skill 3 -->
+            <button id="skill-btn-3" type="button" class="skill-slot relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-slate-900 border-2 border-emerald-500/75 hover:border-emerald-300 flex flex-col items-center justify-center transition active:scale-95 overflow-hidden cursor-pointer">
+                <span id="skill-icon-3" class="text-xl sm:text-2xl">✨</span>
+                <span id="skill-name-3" class="text-[9px] text-emerald-200 font-bold truncate w-full text-center px-0.5">สกิล 3</span>
+                <span class="absolute top-0.5 left-1 text-[9px] text-emerald-400 font-mono font-bold">3</span>
+                <div id="skill-cd-3" class="hidden absolute inset-0 bg-slate-950/85 flex items-center justify-center text-sm font-bold text-white">0</div>
+            </button>
+
+            <div class="h-10 w-[1px] bg-slate-700 mx-0.5"></div>
+
+            <!-- Quick HP Potion -->
+            <button id="btn-use-hppot" type="button" title="ใช้โพชั่นฟื้นเลือด (Q)" class="relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-slate-900 border border-rose-500/70 hover:border-rose-400 flex flex-col items-center justify-center transition active:scale-95 cursor-pointer">
+                <span class="text-lg">🧪</span>
+                <span id="hud-hppot-count" class="text-[10px] font-bold text-rose-300">x3</span>
+                <span class="absolute top-0.5 left-1 text-[8px] text-slate-400 font-mono">Q</span>
+            </button>
+            <!-- Quick MP Potion -->
+            <button id="btn-use-mppot" type="button" title="ใช้โพชั่นฟื้นมานา (E)" class="relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-slate-900 border border-sky-500/70 hover:border-sky-400 flex flex-col items-center justify-center transition active:scale-95 cursor-pointer">
+                <span class="text-lg">⚗️</span>
+                <span id="hud-mppot-count" class="text-[10px] font-bold text-sky-300">x2</span>
+                <span class="absolute top-0.5 left-1 text-[8px] text-slate-400 font-mono">E</span>
+            </button>
+        </div>
+
+        <!-- BOTTOM-LEFT: Virtual Joystick (Mouse & Touch) -->
+        <div id="joystick-zone" class="fixed bottom-20 left-5 z-20 w-28 h-28 rounded-full bg-slate-900/50 border-2 border-amber-400/35 backdrop-blur-sm flex items-center justify-center cursor-grab active:cursor-grabbing">
+            <div id="joystick-knob" class="w-12 h-12 rounded-full bg-gradient-to-br from-amber-300 to-amber-600 border-2 border-white/80 shadow-lg pointer-events-none"></div>
+        </div>
+
+        <!-- BOTTOM-RIGHT: On-Screen D-Pad -->
+        <div id="dpad-controls" class="fixed bottom-20 right-4 z-20 grid grid-cols-3 gap-1 w-28 h-28 select-none">
+            <div></div>
+            <button type="button" data-dir="up" class="dpad-btn rounded-xl bg-slate-900/80 hover:bg-amber-600/80 active:bg-amber-500 border border-slate-600 text-white font-bold flex items-center justify-center shadow-lg cursor-pointer">▲</button>
+            <div></div>
+            <button type="button" data-dir="left" class="dpad-btn rounded-xl bg-slate-900/80 hover:bg-amber-600/80 active:bg-amber-500 border border-slate-600 text-white font-bold flex items-center justify-center shadow-lg cursor-pointer">◀</button>
+            <div class="rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-center text-[10px] text-slate-400">เดิน</div>
+            <button type="button" data-dir="right" class="dpad-btn rounded-xl bg-slate-900/80 hover:bg-amber-600/80 active:bg-amber-500 border border-slate-600 text-white font-bold flex items-center justify-center shadow-lg cursor-pointer">▶</button>
+            <div></div>
+            <button type="button" data-dir="down" class="dpad-btn rounded-xl bg-slate-900/80 hover:bg-amber-600/80 active:bg-amber-500 border border-slate-600 text-white font-bold flex items-center justify-center shadow-lg cursor-pointer">▼</button>
+            <div></div>
+        </div>
+
+        <!-- ==================== POPUP MODALS ==================== -->
+        <!-- Stats Modal -->
+        <div id="modal-stats" class="hidden fixed inset-0 z-40 bg-black/65 flex items-center justify-center p-4">
+            <div class="fantasy-panel rounded-2xl w-full max-w-md p-5 relative">
+                <button type="button" class="close-modal absolute top-3 right-3 text-slate-400 hover:text-white text-lg font-bold cursor-pointer">✕</button>
+                <h2 class="text-xl font-bold text-amber-300 border-b border-slate-700 pb-2 mb-3">📊 ข้อมูลสเตตัสตัวละคร</h2>
+                <div class="flex justify-between items-center bg-slate-900/90 p-3 rounded-xl mb-3 border border-amber-500/35">
+                    <span class="text-sm text-slate-300">แต้มอัปเกรดคงเหลือ (Stat Points):</span>
+                    <span id="modal-stat-points" class="text-lg font-bold text-amber-400">0</span>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center justify-between bg-slate-900/75 p-2.5 rounded-xl">
+                        <div>
+                            <span class="text-orange-400 font-bold">⚔️ STR (พลังโจมตีกายภาพ)</span>
+                            <p class="text-[11px] text-slate-400">เพิ่มดาเมจโจมตีพื้นฐานและสกิลกายภาพ</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span id="modal-val-str" class="font-bold text-base">16</span>
+                            <button type="button" data-stat="str" class="btn-add-stat w-7 h-7 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold cursor-pointer">+</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between bg-slate-900/75 p-2.5 rounded-xl">
+                        <div>
+                            <span class="text-purple-400 font-bold">🔮 INT (พลังเวทมนตร์ & มานา)</span>
+                            <p class="text-[11px] text-slate-400">เพิ่มดาเมจเวทมนตร์และมานาสูงสุด</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span id="modal-val-int" class="font-bold text-base">6</span>
+                            <button type="button" data-stat="int" class="btn-add-stat w-7 h-7 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold cursor-pointer">+</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between bg-slate-900/75 p-2.5 rounded-xl">
+                        <div>
+                            <span class="text-emerald-400 font-bold">⚡ AGI (ความเร็ว & คริติคอล)</span>
+                            <p class="text-[11px] text-slate-400">เพิ่มความเร็วเคลื่อนที่และโอกาสคริติคอล</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span id="modal-val-agi" class="font-bold text-base">9</span>
+                            <button type="button" data-stat="agi" class="btn-add-stat w-7 h-7 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold cursor-pointer">+</button>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between bg-slate-900/75 p-2.5 rounded-xl">
+                        <div>
+                            <span class="text-amber-400 font-bold">🛡️ VIT (ความอึด & พลังชีวิต)</span>
+                            <p class="text-[11px] text-slate-400">เพิ่ม HP สูงสุดและลดความเสียหายที่ได้รับ</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span id="modal-val-vit" class="font-bold text-base">14</span>
+                            <button type="button" data-stat="vit" class="btn-add-stat w-7 h-7 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold cursor-pointer">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3 pt-3 border-t border-slate-700 grid grid-cols-2 gap-2 text-xs text-slate-300">
+                    <div>พลังโจมตีรวม: <span id="modal-total-atk" class="text-amber-300 font-bold">25</span></div>
+                    <div>ระดับอาวุธ: <span id="modal-weapon-lv" class="text-sky-300 font-bold">+0</span></div>
+                    <div>โอกาสคริติคอล: <span id="modal-crit-rate" class="text-emerald-300 font-bold">10%</span></div>
+                    <div>พลังป้องกัน: <span id="modal-def" class="text-amber-300 font-bold">14</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory Modal -->
+        <div id="modal-inv" class="hidden fixed inset-0 z-40 bg-black/65 flex items-center justify-center p-4">
+            <div class="fantasy-panel rounded-2xl w-full max-w-md p-5 relative">
+                <button type="button" class="close-modal absolute top-3 right-3 text-slate-400 hover:text-white text-lg font-bold cursor-pointer">✕</button>
+                <div class="flex justify-between items-center border-b border-slate-700 pb-2 mb-3">
+                    <h2 class="text-xl font-bold text-amber-300">🎒 กระเป๋าสัมภาระ</h2>
+                    <span class="text-sm text-yellow-400 font-bold mr-6">💰 <span id="inv-gold">150</span> G</span>
+                </div>
+                <div id="inv-grid" class="grid grid-cols-2 gap-2.5 max-h-72 overflow-y-auto pr-1"></div>
+            </div>
+        </div>
+
+        <!-- NPC Interaction Modal -->
+        <div id="modal-npc" class="hidden fixed inset-0 z-40 bg-black/65 flex items-center justify-center p-4">
+            <div class="fantasy-panel rounded-2xl w-full max-w-lg p-5 relative">
+                <button type="button" class="close-modal absolute top-3 right-3 text-slate-400 hover:text-white text-lg font-bold cursor-pointer">✕</button>
+                <div class="flex items-center gap-3 border-b border-slate-700 pb-3 mb-3">
+                    <div id="npc-modal-icon" class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400 flex items-center justify-center text-2xl">🧙‍♂️</div>
+                    <div>
+                        <h2 id="npc-modal-name" class="text-lg font-bold text-amber-300">ผู้เฒ่าเอเธอร์</h2>
+                        <p id="npc-modal-desc" class="text-xs text-slate-300">ยินดีต้อนรับนักผจญภัยหน้าใหม่!</p>
+                    </div>
+                </div>
+                <div id="npc-modal-content" class="space-y-2.5 max-h-80 overflow-y-auto pr-1"></div>
+            </div>
+        </div>
+
+        <!-- Custom Confirmation Modal -->
+        <div id="modal-confirm" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center p-4">
+            <div class="fantasy-panel rounded-2xl w-full max-w-sm p-5 text-center">
+                <div class="text-3xl mb-2">⚠️</div>
+                <h3 class="text-lg font-bold text-amber-300 mb-1">สร้างตัวละครใหม่?</h3>
+                <p class="text-xs text-slate-300 mb-4">คุณต้องการกลับไปหน้าสร้างตัวละครใหม่หรือไม่? (ข้อมูลปัจจุบันถูกบันทึกไว้ในปุ่มเล่นต่อแล้ว)</p>
+                <div class="flex gap-2.5 justify-center">
+                    <button id="btn-confirm-cancel" type="button" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs font-bold cursor-pointer">ยกเลิก</button>
+                    <button id="btn-confirm-ok" type="button" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold cursor-pointer">ไปหน้าสร้างตัวละคร</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notification Container -->
+        <div id="toast-container" class="fixed top-20 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-1.5 pointer-events-none"></div>
     </div>
 
-    <canvas id="gameCanvas"></canvas>
-
-    <!-- Firebase SDKs -->
+    <!-- Firebase SDKs (Modular v10) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue, update, remove, onDisconnect, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // URL ฐานข้อมูลของคุณ (อัปเดตตามที่ตั้งค่า Firebase)
+        // Firebase Configuration (Using Public Realtime Database for instant multiplayer)
         const firebaseConfig = {
-            databaseURL: "https://mmorpg-dmhunteronline-default-rtdb.asia-southeast1.firebasedatabase.app/"
+            databaseURL: "https://demonz-hunter-online-default-rtdb.asia-southeast1.firebasedatabase.app/"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        window.db = db;
-        window.ref = ref;
-        window.set = set;
-        window.onValue = onValue;
-        window.update = update;
-        window.remove = remove;
-        window.onDisconnect = onDisconnect;
-        window.push = push;
+        window.FB_DB = db;
+        window.FB_ref = ref;
+        window.FB_set = set;
+        window.FB_onValue = onValue;
+        window.FB_update = update;
+        window.FB_remove = remove;
+        window.FB_onDisconnect = onDisconnect;
+        window.FB_push = push;
+        window.firebaseReady = true;
     </script>
 
     <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const minimapCanvas = document.getElementById('minimapCanvas');
-        const miniCtx = minimapCanvas.getContext('2d');
+    /**
+     * ============================================================================
+     * AETHERIA ONLINE - FIREBASE MULTIPLAYER MMORPG ENGINE
+     * ============================================================================
+     */
 
+    const SAVE_KEY = 'aetheria_mmorpg_save_v2';
+    const WORLD_WIDTH = 2400;
+    const WORLD_HEIGHT = 2400;
+
+    let myPlayerId = 'player_' + Math.random().toString(36).substr(2, 9);
+    let remotePlayers = {}; // Other online players synced from Firebase
+
+    // --- 1. WEB AUDIO API SOUND SYNTHESIZER ---
+    const SoundFX = {
+        enabled: true,
+        ctx: null,
+        init() {
+            if (!this.ctx) {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (AudioCtx) this.ctx = new AudioCtx();
+            }
+            if (this.ctx && this.ctx.state === 'suspended') {
+                this.ctx.resume().catch(() => {});
+            }
+        },
+        play(type) {
+            if (!this.enabled) return;
+            this.init();
+            if (!this.ctx) return;
+            try {
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                if (type === 'swing') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(320, now);
+                    osc.frequency.exponentialRampToValueAtTime(90, now + 0.12);
+                    gain.gain.setValueAtTime(0.14, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+                    osc.start(now);
+                    osc.stop(now + 0.13);
+                } else if (type === 'magic') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(520, now);
+                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.16);
+                    gain.gain.setValueAtTime(0.13, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.17);
+                    osc.start(now);
+                    osc.stop(now + 0.18);
+                } else if (type === 'hit') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(45, now + 0.1);
+                    gain.gain.setValueAtTime(0.14, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+                    osc.start(now);
+                    osc.stop(now + 0.12);
+                } else if (type === 'skill') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(260, now);
+                    osc.frequency.exponentialRampToValueAtTime(640, now + 0.22);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.23);
+                    osc.start(now);
+                    osc.stop(now + 0.24);
+                } else if (type === 'levelup') {
+                    const notes = [523.25, 659.25, 783.99, 1046.5];
+                    notes.forEach((freq, idx) => {
+                        const o = this.ctx.createOscillator();
+                        const g = this.ctx.createGain();
+                        o.type = 'triangle';
+                        o.connect(g);
+                        g.connect(this.ctx.destination);
+                        o.frequency.setValueAtTime(freq, now + idx * 0.08);
+                        g.gain.setValueAtTime(0.14, now + idx * 0.08);
+                        g.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.25);
+                        o.start(now + idx * 0.08);
+                        o.stop(now + idx * 0.08 + 0.26);
+                    });
+                } else if (type === 'coin') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(980, now);
+                    osc.frequency.setValueAtTime(1318, now + 0.06);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+                    osc.start(now);
+                    osc.stop(now + 0.19);
+                }
+            } catch (e) {}
+        }
+    };
+
+    // --- 2. GAME DATA & CONFIG ---
+    const CLASSES = {
+        warrior: {
+            id: 'warrior',
+            name: 'นักรบ (Warrior)',
+            shortName: 'นักรบ',
+            role: 'สายแทงค์ / โจมตีใกล้',
+            hp: 180, mp: 60, str: 16, int: 6, agi: 9, vit: 14,
+            range: 72,
+            skills: [
+                { id: 'slashwave', name: 'คลื่นดาบ', icon: '⚔️', mp: 12, cd: 2.5 },
+                { id: 'whirlwind', name: 'พายุหมุน', icon: '🌪️', mp: 18, cd: 4.5 },
+                { id: 'warcry', name: 'คำรามเพิ่มพลัง', icon: '🔥', mp: 20, cd: 9.0 }
+            ]
+        },
+        mage: {
+            id: 'mage',
+            name: 'นักเวท (Mage)',
+            shortName: 'นักเวท',
+            role: 'สายเวทมนตร์ระยะไกล',
+            hp: 120, mp: 140, str: 6, int: 18, agi: 8, vit: 8,
+            range: 270,
+            skills: [
+                { id: 'fireball', name: 'ลูกไฟระเบิด', icon: '🔥', mp: 16, cd: 2.2 },
+                { id: 'frostnova', name: 'พายุน้ำแข็ง', icon: '❄️', mp: 25, cd: 5.0 },
+                { id: 'meteor', name: 'อุกกาบาต', icon: '☄️', mp: 35, cd: 7.5 }
+            ]
+        },
+        archer: {
+            id: 'archer',
+            name: 'นักธนู (Archer)',
+            shortName: 'นักธนู',
+            role: 'สายโจมตีเร็ว / คริติคอล',
+            hp: 140, mp: 90, str: 11, int: 8, agi: 17, vit: 10,
+            range: 290,
+            skills: [
+                { id: 'multishot', name: 'ยิงธนู 3 ดอก', icon: '🏹', mp: 14, cd: 2.2 },
+                { id: 'dashshot', name: 'พุ่งหลบยิง', icon: '💨', mp: 16, cd: 4.0 },
+                { id: 'arrowrain', name: 'ฝนธนูมรณะ', icon: '🌧️', mp: 28, cd: 6.5 }
+            ]
+        }
+    };
+
+    const CUSTOMIZATION_OPTIONS = {
+        skinColors: ['#ffdbac', '#f1c27d', '#e0ac69', '#c68642', '#8d5524', '#a5b4fc'],
+        hairStyles: [
+            { id: 'short', label: 'ผมสั้น' },
+            { id: 'long', label: 'ผมยาว' },
+            { id: 'spiky', label: 'ผมตั้งแหลม' },
+            { id: 'twintails', label: 'ผมแกละ' },
+            { id: 'hood', label: 'ใส่ฮู้ด' }
+        ],
+        hairColors: ['#1e293b', '#78350f', '#f59e0b', '#dc2626', '#2563eb', '#ec4899', '#10b981', '#f8fafc'],
+        outfitColors: ['#dc2626', '#2563eb', '#059669', '#7c3aed', '#d97706', '#0891b2', '#db2777', '#334155']
+    };
+
+    const RANDOM_THAI_NAMES = [
+        'อัศวินสายฟ้า', 'จอมเวทเพลิง', 'นักล่าเงา', 'เทพบุตรดาบคู่', 'ซากุระจัง',
+        'มังกรทมิฬ', 'ผู้กล้าแห่งแสง', 'คิริโตะไทย', 'เซียนกระบี่', 'ภูตน้อยน่ารัก',
+        'ราชันย์ปีศาจ', 'เหยี่ยวเวหา', 'เจ้าชายน้ำแข็ง', 'นักรบคลั่ง', 'จอมขมังเวทย์'
+    ];
+
+    const ZONES = [
+        { id: 'town', name: '🏰 เมืองเอเธอร์เรีย (Town Square)', x: 0, y: 0, w: 1200, h: 1200, bg: '#3c5247', tile: '#33463d' },
+        { id: 'forest', name: '🌲 ป่ามรกต (Emerald Forest)', x: 1200, y: 0, w: 1200, h: 1200, bg: '#1e4222', tile: '#18361b' },
+        { id: 'lava', name: '🌋 ดันเจี้ยนลาวา (Lava Dungeon)', x: 0, y: 1200, w: 2400, h: 1200, bg: '#3b1717', tile: '#2e1010' }
+    ];
+
+    const QUESTS_DATA = [
+        { id: 'q1', title: 'ปราบสไลม์เขียวป่วนป่า', targetType: 'slime', targetName: 'สไลม์เขียว', required: 5, rewardGold: 150, rewardExp: 120, desc: 'ช่วยกำจัดสไลม์เขียวในป่ามรกต 5 ตัว' },
+        { id: 'q2', title: 'ขับไล่ฝูงหมาป่าป่า', targetType: 'wolf', targetName: 'หมาป่าป่า', required: 5, rewardGold: 280, rewardExp: 250, desc: 'กำจัดหมาป่าป่าในป่ามรกต 5 ตัว' },
+        { id: 'q3', title: 'กวาดล้างอิมพ์ไฟนรก', targetType: 'imp', targetName: 'อิมพ์ไฟ', required: 5, rewardGold: 450, rewardExp: 420, desc: 'ลงไปดันเจี้ยนลาวาทางใต้และกำจัดอิมพ์ไฟ 5 ตัว' },
+        { id: 'q4', title: 'พิชิตบอสมังกรเพลิง Ignis', targetType: 'ignis', targetName: 'มังกรเพลิง Ignis', required: 1, rewardGold: 1500, rewardExp: 1200, desc: 'ท้าทายและโค่นบอสมังกรเพลิง Ignis ในส่วนลึกของดันเจี้ยนลาวา!' }
+    ];
+
+    let gameState = 'CREATION';
+    let previewDir = 0;
+    let camera = { x: 800, y: 800 };
+    let targetPos = null;
+    let controlsBound = false;
+    let gameLoopStarted = false;
+
+    function createFreshPlayer(name = '', classId = 'warrior', appearance = null) {
+        const cls = CLASSES[classId] || CLASSES.warrior;
+        const app = appearance ? { ...appearance } : {
+            skin: CUSTOMIZATION_OPTIONS.skinColors[0],
+            hairStyle: 'short',
+            hairColor: CUSTOMIZATION_OPTIONS.hairColors[0],
+            outfitColor: CUSTOMIZATION_OPTIONS.outfitColors[0]
+        };
+        return {
+            id: myPlayerId,
+            name: name,
+            classId: cls.id,
+            appearance: app,
+            x: 800,
+            y: 800,
+            dir: 0,
+            animFrame: 0,
+            level: 1,
+            exp: 0,
+            maxExp: 100,
+            gold: 150,
+            statPoints: 0,
+            str: cls.str,
+            int: cls.int,
+            agi: cls.agi,
+            vit: cls.vit,
+            hp: cls.hp,
+            maxHp: cls.hp,
+            mp: cls.mp,
+            maxMp: cls.mp,
+            weaponLevel: 0,
+            attackCooldown: 0,
+            skillCooldowns: [0, 0, 0],
+            buffTimer: 0,
+            isAttacking: 0,
+            inventory: [
+                { id: 'hp_pot', name: 'โพชั่นฟื้นเลือด', icon: '🧪', type: 'consumable', count: 3, desc: 'ฟื้นฟู HP 100 หน่วย (กด Q)' },
+                { id: 'mp_pot', name: 'โพชั่นฟื้นมานา', icon: '⚗️', type: 'consumable', count: 2, desc: 'ฟื้นฟู MP 60 หน่วย (กด E)' }
+            ],
+            activeQuest: null,
+            completedQuests: []
+        };
+    }
+
+    let player = createFreshPlayer();
+
+    let obstacles = [];
+    let npcs = [];
+    let monsters = [];
+    let projectiles = [];
+    let drops = [];
+    let floatingTexts = [];
+    let particles = [];
+
+    const keys = {};
+    let joystickVec = { x: 0, y: 0 };
+    let dpadVec = { x: 0, y: 0 };
+
+    // --- 3. CHARACTER SPRITE RENDERER ---
+    function drawCharacterSprite(ctx, x, y, entity, scale = 1, isAttacking = false) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(scale, scale);
+
+        const app = entity.appearance || {
+            skin: '#ffdbac',
+            hairStyle: 'short',
+            hairColor: '#1e293b',
+            outfitColor: '#dc2626'
+        };
+        const dir = entity.dir || 0;
+        const bob = Math.sin((entity.animFrame || 0) * 0.25) * 2;
+        const legSwing = Math.sin((entity.animFrame || 0) * 0.25) * 4;
+
+        // Ground Shadow
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+        ctx.beginPath();
+        ctx.ellipse(0, 18, 14, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Buff Aura if active
+        if (entity.buffTimer && entity.buffTimer > 0) {
+            ctx.strokeStyle = 'rgba(251, 191, 36, 0.75)';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.arc(0, 2, 22 + Math.sin(performance.now() * 0.01) * 2, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        // Legs
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        ctx.roundRect(-8, 10 + (dir === 1 || dir === 2 ? legSwing * 0.4 : 0), 6, 9, 3);
+        ctx.roundRect(2, 10 - (dir === 1 || dir === 2 ? legSwing * 0.4 : 0), 6, 9, 3);
+        ctx.fill();
+
+        // Torso
+        ctx.fillStyle = app.outfitColor;
+        ctx.beginPath();
+        ctx.roundRect(-11, -4 + bob, 22, 17, 6);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+
+        // Belt
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(-10, 7 + bob, 20, 3);
+        ctx.fillStyle = '#fbbf24';
+        ctx.fillRect(-3, 6.5 + bob, 6, 4);
+
+        // Long hair back
+        if (dir !== 3 && (app.hairStyle === 'long' || app.hairStyle === 'twintails')) {
+            ctx.fillStyle = app.hairColor;
+            if (app.hairStyle === 'long') {
+                ctx.beginPath();
+                ctx.roundRect(-13, -18 + bob, 26, 26, 8);
+                ctx.fill();
+            } else if (app.hairStyle === 'twintails') {
+                ctx.beginPath();
+                ctx.ellipse(-15, -10 + bob, 4.5, 11, 0.25, 0, Math.PI * 2);
+                ctx.ellipse(15, -10 + bob, 4.5, 11, -0.25, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Head
+        ctx.fillStyle = app.skin;
+        ctx.beginPath();
+        ctx.arc(0, -14 + bob, 11.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Eyes
+        if (dir !== 3) {
+            ctx.fillStyle = '#0f172a';
+            const eyeOffsetX = dir === 1 ? -4 : (dir === 2 ? 4 : 0);
+            ctx.beginPath();
+            ctx.arc(-4 + eyeOffsetX, -13 + bob, 1.8, 0, Math.PI * 2);
+            ctx.arc(4 + eyeOffsetX, -13 + bob, 1.8, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = 'rgba(244, 63, 94, 0.35)';
+            ctx.beginPath();
+            ctx.arc(-6 + eyeOffsetX, -10.5 + bob, 2, 0, Math.PI * 2);
+            ctx.arc(6 + eyeOffsetX, -10.5 + bob, 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Hair
+        ctx.fillStyle = app.hairColor;
+        if (app.hairStyle === 'hood') {
+            ctx.fillStyle = app.outfitColor;
+            ctx.beginPath();
+            ctx.arc(0, -15 + bob, 13, Math.PI * 0.85, Math.PI * 2.15);
+            ctx.lineTo(11, -6 + bob);
+            ctx.lineTo(-11, -6 + bob);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = '#fbbf24';
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+        } else if (dir === 3) {
+            ctx.beginPath();
+            ctx.arc(0, -14 + bob, 12.2, 0, Math.PI * 2);
+            ctx.fill();
+            if (app.hairStyle === 'long') {
+                ctx.fillRect(-11, -14 + bob, 22, 20);
+            }
+        } else {
+            ctx.beginPath();
+            ctx.arc(0, -16 + bob, 12, Math.PI, Math.PI * 2);
+            ctx.fill();
+
+            if (app.hairStyle === 'spiky') {
+                ctx.beginPath();
+                ctx.moveTo(-11, -18 + bob);
+                ctx.lineTo(-7, -30 + bob);
+                ctx.lineTo(-2, -21 + bob);
+                ctx.lineTo(1, -32 + bob);
+                ctx.lineTo(5, -21 + bob);
+                ctx.lineTo(10, -29 + bob);
+                ctx.lineTo(11, -18 + bob);
+                ctx.fill();
+            } else if (app.hairStyle === 'short' || app.hairStyle === 'long' || app.hairStyle === 'twintails') {
+                ctx.beginPath();
+                ctx.moveTo(-11, -17 + bob);
+                ctx.lineTo(-5, -12 + bob);
+                ctx.lineTo(0, -16 + bob);
+                ctx.lineTo(5, -12 + bob);
+                ctx.lineTo(11, -17 + bob);
+                ctx.fill();
+            }
+        }
+
+        // Hands
+        ctx.fillStyle = app.skin;
+        ctx.beginPath();
+        ctx.arc(-13, 3 + bob, 3.5, 0, Math.PI * 2);
+        ctx.arc(13, 3 + bob, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Weapon
+        const wLv = entity.weaponLevel || 0;
+        const swingAngle = isAttacking ? 0.95 : 0;
+        ctx.save();
+        ctx.translate(dir === 1 ? -14 : 14, 2 + bob);
+        if (dir === 1) ctx.scale(-1, 1);
+        ctx.rotate(swingAngle);
+
+        if (wLv > 0) {
+            ctx.shadowColor = wLv >= 5 ? '#f43f5e' : (wLv >= 3 ? '#f59e0b' : '#38bdf8');
+            ctx.shadowBlur = 8 + wLv * 2;
+        }
+
+        if (entity.classId === 'warrior') {
+            ctx.fillStyle = wLv >= 5 ? '#fda4af' : (wLv >= 3 ? '#fde047' : '#e2e8f0');
+            ctx.beginPath();
+            ctx.moveTo(-2, 0); ctx.lineTo(-2, -24); ctx.lineTo(0, -29); ctx.lineTo(2, -24); ctx.lineTo(2, 0);
+            ctx.fill();
+            ctx.fillStyle = '#d97706';
+            ctx.fillRect(-6, -2, 12, 3);
+        } else if (entity.classId === 'mage') {
+            ctx.fillStyle = '#92400e';
+            ctx.fillRect(-1.5, -26, 3, 34);
+            ctx.fillStyle = wLv >= 3 ? '#f43f5e' : '#38bdf8';
+            ctx.beginPath();
+            ctx.arc(0, -28, 5, 0, Math.PI * 2);
+            ctx.fill();
+        } else if (entity.classId === 'archer') {
+            ctx.strokeStyle = wLv >= 3 ? '#fbbf24' : '#b45309';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(-2, -4, 15, -Math.PI * 0.45, Math.PI * 0.45);
+            ctx.stroke();
+        }
+        ctx.restore();
+        ctx.restore();
+    }
+
+    // --- 4. FIREBASE MULTIPLAYER INITIALIZATION & SYNC ---
+    function initFirebaseMultiplayer() {
+        if (!window.firebaseReady) return;
+
+        // Register player node & cleanup on disconnect
+        const myRef = window.FB_ref(window.FB_DB, 'players/' + myPlayerId);
+        window.FB_set(myRef, {
+            id: myPlayerId,
+            name: player.name,
+            classId: player.classId,
+            appearance: player.appearance,
+            x: player.x,
+            y: player.y,
+            dir: player.dir,
+            level: player.level,
+            hp: player.hp,
+            maxHp: player.maxHp,
+            isAttacking: 0
+        });
+        window.FB_onDisconnect(myRef).remove();
+
+        // Listen to all players online
+        const allPlayersRef = window.FB_ref(window.FB_DB, 'players');
+        window.FB_onValue(allPlayersRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                remotePlayers = data;
+                delete remotePlayers[myPlayerId];
+                const count = Object.keys(data).length;
+                document.getElementById('online-count-badge').textContent = `ออนไลน์ ${count}`;
+            } else {
+                remotePlayers = {};
+                document.getElementById('online-count-badge').textContent = `ออนไลน์ 1`;
+            }
+        });
+
+        // Listen to Firebase World Chat
+        const chatRef = window.FB_ref(window.FB_DB, 'chats');
+        window.FB_onValue(chatRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                const container = document.getElementById('chat-messages');
+                container.innerHTML = '';
+                Object.values(data).slice(-30).forEach(msg => {
+                    const div = document.createElement('div');
+                    div.className = 'text-slate-200';
+                    div.innerHTML = `<span class="font-bold text-amber-300">[${msg.sender}]</span> ${msg.text}`;
+                    container.appendChild(div);
+                });
+                container.scrollTop = container.scrollHeight;
+            }
+        });
+    }
+
+    let lastSyncTime = 0;
+    function syncPlayerToFirebase(forced = false) {
+        if (!window.firebaseReady) return;
+        const now = performance.now();
+        if (forced || now - lastSyncTime > 60) {
+            lastSyncTime = now;
+            const myRef = window.FB_ref(window.FB_DB, 'players/' + myPlayerId);
+            window.FB_update(myRef, {
+                x: Math.round(player.x),
+                y: Math.round(player.y),
+                dir: player.dir,
+                hp: Math.round(player.hp),
+                level: player.level,
+                isAttacking: player.isAttacking > 0 ? 1 : 0
+            });
+        }
+    }
+
+    // --- 5. CREATION & SAVE UI ---
+    function refreshContinueSaveButton() {
+        const btnLoad = document.getElementById('btn-load-save');
+        const raw = localStorage.getItem(SAVE_KEY);
+        if (!raw) {
+            btnLoad.classList.add('hidden');
+            return;
+        }
+        try {
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed.name === 'string' && parsed.name.trim().length >= 2) {
+                btnLoad.classList.remove('hidden');
+                document.getElementById('save-info-badge').textContent = `${parsed.name} (Lv.${parsed.level || 1})`;
+                btnLoad.onclick = () => {
+                    SoundFX.init();
+                    const base = createFreshPlayer(parsed.name, parsed.classId, parsed.appearance);
+                    player = {
+                        ...base,
+                        ...parsed,
+                        appearance: { ...base.appearance, ...(parsed.appearance || {}) },
+                        x: Number.isFinite(parsed.x) ? parsed.x : 800,
+                        y: Number.isFinite(parsed.y) ? parsed.y : 800,
+                        hp: Number.isFinite(parsed.hp) && parsed.hp > 0 ? parsed.hp : (parsed.maxHp || base.maxHp),
+                        maxHp: Number.isFinite(parsed.maxHp) ? parsed.maxHp : base.maxHp,
+                        mp: Number.isFinite(parsed.mp) ? parsed.mp : (parsed.maxMp || base.maxMp),
+                        maxMp: Number.isFinite(parsed.maxMp) ? parsed.maxMp : base.maxMp
+                    };
+                    startGame(false);
+                };
+            }
+        } catch (e) {
+            btnLoad.classList.add('hidden');
+        }
+    }
+
+    function initCreationUI() {
+        const previewCanvas = document.getElementById('preview-canvas');
+        const pCtx = previewCanvas.getContext('2d');
+        const nameInput = document.getElementById('input-char-name');
+
+        refreshContinueSaveButton();
+
+        // Skin Colors
+        const skinContainer = document.getElementById('picker-skin');
+        CUSTOMIZATION_OPTIONS.skinColors.forEach((color, idx) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = `w-6 h-6 rounded-full border-2 transition cursor-pointer ${idx === 0 ? 'border-amber-400 scale-110' : 'border-slate-600'}`;
+            btn.style.backgroundColor = color;
+            btn.onclick = () => {
+                player.appearance.skin = color;
+                [...skinContainer.children].forEach(c => c.className = 'w-6 h-6 rounded-full border-2 border-slate-600 transition cursor-pointer');
+                btn.className = 'w-6 h-6 rounded-full border-2 border-amber-400 scale-110 transition cursor-pointer';
+            };
+            skinContainer.appendChild(btn);
+        });
+
+        // Hairstyles
+        const hairStyleContainer = document.getElementById('picker-hairstyle');
+        CUSTOMIZATION_OPTIONS.hairStyles.forEach((style, idx) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = style.label;
+            btn.className = `px-2 py-1 rounded-lg border text-[11px] font-medium transition cursor-pointer ${idx === 0 ? 'border-amber-400 bg-amber-500/25 text-amber-200' : 'border-slate-700 bg-slate-800 text-slate-300'}`;
+            btn.onclick = () => {
+                player.appearance.hairStyle = style.id;
+                [...hairStyleContainer.children].forEach(c => c.className = 'px-2 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 text-[11px] font-medium transition cursor-pointer');
+                btn.className = 'px-2 py-1 rounded-lg border border-amber-400 bg-amber-500/25 text-amber-200 text-[11px] font-medium transition cursor-pointer';
+            };
+            hairStyleContainer.appendChild(btn);
+        });
+
+        // Hair Colors
+        const hairColorContainer = document.getElementById('picker-haircolor');
+        CUSTOMIZATION_OPTIONS.hairColors.forEach((color, idx) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = `w-6 h-6 rounded-full border-2 transition cursor-pointer ${idx === 0 ? 'border-amber-400 scale-110' : 'border-slate-600'}`;
+            btn.style.backgroundColor = color;
+            btn.onclick = () => {
+                player.appearance.hairColor = color;
+                [...hairColorContainer.children].forEach(c => c.className = 'w-6 h-6 rounded-full border-2 border-slate-600 transition cursor-pointer');
+                btn.className = 'w-6 h-6 rounded-full border-2 border-amber-400 scale-110 transition cursor-pointer';
+            };
+            hairColorContainer.appendChild(btn);
+        });
+
+        // Outfit Colors
+        const outfitContainer = document.getElementById('picker-outfit');
+        CUSTOMIZATION_OPTIONS.outfitColors.forEach((color, idx) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = `w-6 h-6 rounded-full border-2 transition cursor-pointer ${idx === 0 ? 'border-amber-400 scale-110' : 'border-slate-600'}`;
+            btn.style.backgroundColor = color;
+            btn.onclick = () => {
+                player.appearance.outfitColor = color;
+                [...outfitContainer.children].forEach(c => c.className = 'w-6 h-6 rounded-full border-2 border-slate-600 transition cursor-pointer');
+                btn.className = 'w-6 h-6 rounded-full border-2 border-amber-400 scale-110 transition cursor-pointer';
+            };
+            outfitContainer.appendChild(btn);
+        });
+
+        // Class Selection
+        document.querySelectorAll('.class-card').forEach(card => {
+            card.onclick = () => {
+                document.querySelectorAll('.class-card').forEach(c => {
+                    c.classList.remove('active', 'border-amber-400', 'bg-amber-500/15');
+                    c.classList.add('border-slate-700', 'bg-slate-900/70');
+                });
+                card.classList.add('active', 'border-amber-400', 'bg-amber-500/15');
+                card.classList.remove('border-slate-700', 'bg-slate-900/70');
+
+                const clsId = card.dataset.class;
+                player.classId = clsId;
+                const cls = CLASSES[clsId];
+                document.getElementById('stat-hp').textContent = cls.hp;
+                document.getElementById('stat-mp').textContent = cls.mp;
+                document.getElementById('stat-str').textContent = cls.str;
+                document.getElementById('stat-int').textContent = cls.int;
+                document.getElementById('stat-agi').textContent = cls.agi;
+                document.getElementById('stat-vit').textContent = cls.vit;
+                document.getElementById('stat-role-badge').textContent = cls.role;
+                document.getElementById('preview-class-tag').textContent = `Lv.1 ${cls.name}`;
+            };
+        });
+
+        nameInput.oninput = () => {
+            document.getElementById('name-error').classList.add('hidden');
+            document.getElementById('preview-name-tag').textContent = nameInput.value.trim() || 'ผู้กล้าเอเธอร์เรีย';
+        };
+        document.getElementById('btn-random-name').onclick = () => {
+            const rnd = RANDOM_THAI_NAMES[Math.floor(Math.random() * RANDOM_THAI_NAMES.length)];
+            nameInput.value = rnd;
+            document.getElementById('name-error').classList.add('hidden');
+            document.getElementById('preview-name-tag').textContent = rnd;
+        };
+
+        const dirSequence = [0, 1, 3, 2];
+        document.getElementById('btn-rotate-left').onclick = () => { previewDir = (previewDir + 1) % 4; };
+        document.getElementById('btn-rotate-right').onclick = () => { previewDir = (previewDir + 3) % 4; };
+
+        document.getElementById('btn-start-game').onclick = () => {
+            const rawName = nameInput.value.trim();
+            if (rawName.length < 2) {
+                document.getElementById('name-error').classList.remove('hidden');
+                nameInput.focus();
+                return;
+            }
+            SoundFX.init();
+            player = createFreshPlayer(rawName, player.classId, { ...player.appearance });
+            saveGame(false);
+            refreshContinueSaveButton();
+            startGame(true);
+        };
+
+        let previewTick = 0;
+        function animatePreview() {
+            if (gameState === 'CREATION') {
+                previewTick++;
+                pCtx.clearRect(0, 0, 192, 192);
+                pCtx.strokeStyle = 'rgba(245, 158, 11, 0.35)';
+                pCtx.lineWidth = 2;
+                pCtx.beginPath();
+                pCtx.ellipse(96, 146, 52, 18, 0, 0, Math.PI * 2);
+                pCtx.stroke();
+
+                const swing = Math.sin(previewTick * 0.06) > 0.85;
+                drawCharacterSprite(pCtx, 96, 108, { ...player, dir: dirSequence[previewDir], animFrame: previewTick * 0.35 }, 2.35, swing);
+            }
+            requestAnimationFrame(animatePreview);
+        }
+        animatePreview();
+    }
+
+    // --- 6. WORLD INITIALIZATION ---
+    function initWorldEntities() {
+        obstacles = [];
+        npcs = [];
+        monsters = [];
+
+        obstacles.push({ type: 'fountain', x: 800, y: 680, r: 48 });
+        const townTrees = [
+            { x: 520, y: 540, r: 24 }, { x: 1060, y: 540, r: 24 },
+            { x: 520, y: 980, r: 24 }, { x: 1060, y: 980, r: 24 }
+        ];
+        townTrees.forEach(t => obstacles.push({ type: 'tree', ...t }));
+
+        for (let i = 0; i < 22; i++) {
+            obstacles.push({ type: 'tree', x: 1280 + (i * 197) % 1020, y: 130 + (i * 271) % 980, r: 26 });
+        }
+
+        const lavaPools = [
+            { x: 420, y: 1550, r: 55 }, { x: 960, y: 1850, r: 65 },
+            { x: 1520, y: 1520, r: 60 }, { x: 2020, y: 1750, r: 55 }
+        ];
+        lavaPools.forEach(p => obstacles.push({ type: 'lavapool', ...p }));
+
+        npcs = [
+            { id: 'elder', name: 'ผู้เฒ่าเอเธอร์', role: 'ผู้มอบภารกิจ (Quest)', icon: '🧙‍♂️', x: 680, y: 740 },
+            { id: 'merchant', name: 'แม่ค้าลิลลี่', role: 'ร้านขายโพชั่น (Shop)', icon: '🧪', x: 920, y: 740 },
+            { id: 'blacksmith', name: 'ช่างตีเหล็กบรอนซ์', role: 'ตีบวกอาวุธ (Upgrade)', icon: '⚒️', x: 800, y: 570 }
+        ];
+
+        for (let i = 0; i < 10; i++) spawnMonster('slime', 1320 + Math.random() * 980, 140 + Math.random() * 960);
+        for (let i = 0; i < 8; i++) spawnMonster('wolf', 1420 + Math.random() * 900, 220 + Math.random() * 880);
+        for (let i = 0; i < 8; i++) spawnMonster('imp', 200 + Math.random() * 1950, 1340 + Math.random() * 820);
+        spawnMonster('ignis', 1250, 2050);
+    }
+
+    function spawnMonster(type, x, y) {
+        const templates = {
+            slime: { name: 'สไลม์เขียว', level: 1, hp: 65, atk: 8, exp: 32, gold: 22, speed: 65, r: 18, color: '#22c55e', isBoss: false },
+            wolf: { name: 'หมาป่าป่า', level: 3, hp: 135, atk: 16, exp: 65, gold: 45, speed: 115, r: 21, color: '#94a3b8', isBoss: false },
+            imp: { name: 'อิมพ์ไฟ', level: 6, hp: 250, atk: 28, exp: 125, gold: 85, speed: 95, r: 22, color: '#f97316', isBoss: false },
+            ignis: { name: '👑 มังกรเพลิง Ignis', level: 12, hp: 1200, atk: 55, exp: 750, gold: 500, speed: 85, r: 44, color: '#dc2626', isBoss: true }
+        };
+        const tpl = templates[type];
+        monsters.push({
+            id: 'm_' + Math.random().toString(36).slice(2, 9),
+            type, name: tpl.name, level: tpl.level, hp: tpl.hp, maxHp: tpl.hp,
+            atk: tpl.atk, exp: tpl.exp, gold: tpl.gold, speed: tpl.speed, r: tpl.r,
+            color: tpl.color, isBoss: tpl.isBoss, x, y, spawnX: x, spawnY: y,
+            dead: false, respawnTimer: 0, hitFlash: 0, slowTimer: 0, atkCooldown: 0
+        });
+    }
+
+    // --- 7. START GAME & CONTROLS ---
+    function startGame(isNewCharacter = true) {
+        gameState = 'PLAYING';
+        document.getElementById('creation-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
+
+        const canvas = document.getElementById('game-canvas');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
+        if (!Number.isFinite(player.x)) player.x = 800;
+        if (!Number.isFinite(player.y)) player.y = 800;
+        if (!Number.isFinite(player.hp) || player.hp <= 0) player.hp = player.maxHp || 180;
+        if (!Number.isFinite(player.mp)) player.mp = player.maxMp || 60;
+
+        targetPos = null;
+        projectiles = [];
+        drops = [];
+        floatingTexts = [];
+        particles = [];
+
+        initWorldEntities();
+        setupGameControls();
+        initFirebaseMultiplayer();
+
+        camera.x = player.x;
+        camera.y = player.y;
+
+        updateHUD();
+        updateSkillBarUI();
+        updateQuestHUD();
+
+        window.focus();
+        canvas.focus();
+
+        const hudCtx = document.getElementById('hud-avatar-canvas').getContext('2d');
+        hudCtx.clearRect(0, 0, 48, 48);
+        drawCharacterSprite(hudCtx, 24, 30, { ...player, dir: 0, animFrame: 0 }, 0.95, false);
+
+        addChatMessage('ระบบ', isNewCharacter ? `สร้างตัวละคร "${player.name}" สำเร็จ!` : `ยินดีต้อนรับกลับมา "${player.name}"!`, 'text-amber-300');
+
+        if (!gameLoopStarted) {
+            gameLoopStarted = true;
+            lastTime = performance.now();
+            requestAnimationFrame(gameLoop);
+        }
+    }
+
+    function saveGame(showNotify = false) {
+        try {
+            const payload = {
+                name: player.name, classId: player.classId, appearance: player.appearance,
+                x: Math.round(player.x), y: Math.round(player.y), level: player.level,
+                exp: player.exp, maxExp: player.maxExp, gold: player.gold,
+                statPoints: player.statPoints, str: player.str, int: player.int,
+                agi: player.agi, vit: player.vit, hp: Math.round(player.hp),
+                maxHp: player.maxHp, mp: Math.round(player.mp), maxMp: player.maxMp,
+                weaponLevel: player.weaponLevel, inventory: player.inventory,
+                activeQuest: player.activeQuest, completedQuests: player.completedQuests
+            };
+            localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
+            if (showNotify) showToast('💾 บันทึกข้อมูลตัวละครเรียบร้อย!', 'text-emerald-300');
+        } catch (e) {}
+    }
+
+    setInterval(() => { if (gameState === 'PLAYING') saveGame(false); }, 10000);
+
+    function setupGameControls() {
+        if (controlsBound) return;
+        controlsBound = true;
+
+        const canvas = document.getElementById('game-canvas');
         window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            if (gameState === 'PLAYING') {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
         });
 
-        let myPlayerId = 'player_' + Math.random().toString(36).substr(2, 9);
-        let playerData = null;
-        let otherPlayers = {};
-        let keys = {};
-        let targetPos = null;
+        const moveCodes = new Set(['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);
+        window.addEventListener('keydown', (e) => {
+            if (gameState !== 'PLAYING') return;
+            if (document.activeElement && document.activeElement.tagName === 'INPUT') {
+                if (e.code === 'Escape') document.activeElement.blur();
+                return;
+            }
+            if (moveCodes.has(e.code) || e.code === 'Space') e.preventDefault();
+            keys[e.code] = true;
+            if (moveCodes.has(e.code)) targetPos = null;
 
-        const WORLD_SIZE = 3000;
+            if (e.code === 'Space') performBasicAttack();
+            if (e.code === 'Digit1' || e.code === 'Numpad1') useSkill(0);
+            if (e.code === 'Digit2' || e.code === 'Numpad2') useSkill(1);
+            if (e.code === 'Digit3' || e.code === 'Numpad3') useSkill(2);
+            if (e.code === 'KeyQ') usePotion('hp_pot');
+            if (e.code === 'KeyE') usePotion('mp_pot');
+            if (e.code === 'KeyF') interactWithNearestNPC();
+            if (e.code === 'Escape') closeAllModals();
+        });
 
-        // NPC และ มอนสเตอร์ในเกม
-        const npcs = [
-            { id: 'npc1', name: 'ผู้เฒ่าเอเดน (เควส)', x: 1400, y: 1400, color: '#f39c12', type: 'quest' },
-            { id: 'npc2', name: 'แม่ค้าลิลลี่ (ร้านค้า)', x: 1600, y: 1400, color: '#e84393', type: 'shop' },
-            { id: 'npc3', name: 'ช่างตีเหล็กบรอนซ์', x: 1500, y: 1300, color: '#fdcb6e', type: 'smith' }
-        ];
+        window.addEventListener('keyup', (e) => { keys[e.code] = false; });
 
-        let monsters = [
-            { id: 'm1', name: 'Slime พิษ', x: 1200, y: 1200, hp: 30, maxHp: 30, color: '#00b894', radius: 14 },
-            { id: 'm2', name: 'Imp ร้าย', x: 1800, y: 1600, hp: 50, maxHp: 50, color: '#d63031', radius: 16 },
-            { id: 'm3', name: 'Demon Guard', x: 2000, y: 1200, hp: 100, maxHp: 100, color: '#6c5ce7', radius: 20 }
-        ];
+        canvas.addEventListener('pointerdown', (e) => {
+            if (gameState !== 'PLAYING') return;
+            SoundFX.init();
+            canvas.focus();
 
-        window.addEventListener('keydown', e => { keys[e.code] = true; });
-        window.addEventListener('keyup', e => { keys[e.code] = false; });
-
-        // คลิกเมาส์เดินหรือโจมตี
-        canvas.addEventListener('click', e => {
-            if (!playerData) return;
             const rect = canvas.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const clickY = e.clientY - rect.top;
-            
-            const worldClickX = clickX - canvas.width / 2 + playerData.x;
-            const worldClickY = clickY - canvas.height / 2 + playerData.y;
+            const sx = e.clientX - rect.left;
+            const sy = e.clientY - rect.top;
+            const worldX = sx - canvas.width / 2 + camera.x;
+            const worldY = sy - canvas.height / 2 + camera.y;
 
-            // เช็คคลิกตบมอนสเตอร์
-            let clickedMonster = false;
-            monsters.forEach(m => {
-                let dist = Math.hypot(m.x - worldClickX, m.y - worldClickY);
-                let pDist = Math.hypot(m.x - playerData.x, m.y - playerData.y);
-                if (dist < 30) {
-                    clickedMonster = true;
-                    if (pDist < 80) {
-                        // โจมตีมอนสเตอร์
-                        m.hp -= 20;
-                        if (m.hp <= 0) {
-                            m.hp = m.maxHp;
-                            m.x = playerData.x + (Math.random() * 400 - 200);
-                            m.y = playerData.y + (Math.random() * 400 - 200);
-                            playerData.gold = (playerData.gold || 0) + 15;
-                            playerData.exp = (playerData.exp || 0) + 25;
-                            if (playerData.exp >= 100) {
-                                playerData.level = (playerData.level || 1) + 1;
-                                playerData.exp = 0;
-                                document.getElementById('hud-level').innerText = 'Lv.' + playerData.level;
-                            }
-                            document.getElementById('hud-gold').innerText = playerData.gold;
-                            document.getElementById('hud-exp').innerText = playerData.exp;
-                        }
-                    } else {
-                        targetPos = { x: m.x, y: m.y };
+            for (const npc of npcs) {
+                if (Math.hypot(worldX - npc.x, worldY - npc.y) < 38) {
+                    if (Math.hypot(player.x - npc.x, player.y - npc.y) < 110) openNPCModal(npc);
+                    else targetPos = { x: npc.x, y: npc.y + 35, pulse: 1, openNpcId: npc.id };
+                    return;
+                }
+            }
+
+            for (const m of monsters) {
+                if (!m.dead && Math.hypot(worldX - m.x, worldY - m.y) < m.r + 22) {
+                    faceTowards(m.x, m.y);
+                    performBasicAttack();
+                    return;
+                }
+            }
+
+            targetPos = { x: Math.max(30, Math.min(WORLD_WIDTH - 30, worldX)), y: Math.max(30, Math.min(WORLD_HEIGHT - 30, worldY)), pulse: 1 };
+        });
+
+        // Joystick
+        const joyZone = document.getElementById('joystick-zone');
+        const joyKnob = document.getElementById('joystick-knob');
+        let joyActive = false;
+        function handleJoystickMove(clientX, clientY) {
+            const rect = joyZone.getBoundingClientRect();
+            const maxDist = rect.width / 2 - 14;
+            let dx = clientX - (rect.left + rect.width / 2);
+            let dy = clientY - (rect.top + rect.height / 2);
+            const dist = Math.hypot(dx, dy);
+            if (dist > maxDist) { dx = (dx / dist) * maxDist; dy = (dy / dist) * maxDist; }
+            joyKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+            joystickVec.x = dx / maxDist;
+            joystickVec.y = dy / maxDist;
+            if (Math.hypot(joystickVec.x, joystickVec.y) > 0.1) targetPos = null;
+        }
+        function resetJoystick() { joyActive = false; joyKnob.style.transform = 'translate(0px, 0px)'; joystickVec = { x: 0, y: 0 }; }
+        joyZone.addEventListener('pointerdown', (e) => { e.preventDefault(); joyActive = true; joyZone.setPointerCapture(e.pointerId); handleJoystickMove(e.clientX, e.clientY); });
+        joyZone.addEventListener('pointermove', (e) => { if (joyActive) handleJoystickMove(e.clientX, e.clientY); });
+        joyZone.addEventListener('pointerup', resetJoystick);
+
+        // D-Pad
+        document.querySelectorAll('.dpad-btn').forEach(btn => {
+            const dir = btn.dataset.dir;
+            const setDir = (active) => {
+                if (active) targetPos = null;
+                if (dir === 'up') dpadVec.y = active ? -1 : 0;
+                if (dir === 'down') dpadVec.y = active ? 1 : 0;
+                if (dir === 'left') dpadVec.x = active ? -1 : 0;
+                if (dir === 'right') dpadVec.x = active ? 1 : 0;
+            };
+            btn.addEventListener('pointerdown', (e) => { e.preventDefault(); setDir(true); });
+            btn.addEventListener('pointerup', () => setDir(false));
+            btn.addEventListener('pointerleave', () => setDir(false));
+        });
+
+        document.getElementById('skill-btn-0').onclick = () => performBasicAttack();
+        document.getElementById('skill-btn-1').onclick = () => useSkill(0);
+        document.getElementById('skill-btn-2').onclick = () => useSkill(1);
+        document.getElementById('skill-btn-3').onclick = () => useSkill(2);
+        document.getElementById('btn-use-hppot').onclick = () => usePotion('hp_pot');
+        document.getElementById('btn-use-mppot').onclick = () => usePotion('mp_pot');
+
+        document.getElementById('btn-toggle-stats').onclick = () => openStatsModal();
+        document.getElementById('btn-toggle-inv').onclick = () => openInventoryModal();
+        document.getElementById('btn-save-now').onclick = () => saveGame(true);
+        document.getElementById('btn-toggle-sound').onclick = (e) => {
+            SoundFX.enabled = !SoundFX.enabled;
+            e.currentTarget.querySelector('span').textContent = SoundFX.enabled ? '🔊' : '🔇';
+        };
+        document.getElementById('btn-interact-npc').onclick = () => interactWithNearestNPC();
+
+        document.getElementById('btn-new-char').onclick = () => {
+            saveGame(false);
+            document.getElementById('modal-confirm').classList.remove('hidden');
+        };
+        document.getElementById('btn-confirm-cancel').onclick = () => document.getElementById('modal-confirm').classList.add('hidden');
+        document.getElementById('btn-confirm-ok').onclick = () => {
+            document.getElementById('modal-confirm').classList.add('hidden');
+            closeAllModals();
+            gameState = 'CREATION';
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('creation-screen').classList.remove('hidden');
+            refreshContinueSaveButton();
+        };
+
+        document.querySelectorAll('.close-modal').forEach(btn => { btn.onclick = () => closeAllModals(); });
+
+        document.querySelectorAll('.btn-add-stat').forEach(btn => {
+            btn.onclick = () => {
+                if (player.statPoints <= 0) return;
+                const stat = btn.dataset.stat;
+                player[stat] += 1;
+                player.statPoints -= 1;
+                if (stat === 'vit') { player.maxHp += 20; player.hp = Math.min(player.maxHp, player.hp + 20); }
+                else if (stat === 'int') { player.maxMp += 12; player.mp = Math.min(player.maxMp, player.mp + 12); }
+                SoundFX.play('coin');
+                updateHUD();
+                openStatsModal();
+            };
+        });
+
+        // Chat Form (Sends to Firebase!)
+        document.getElementById('chat-form').onsubmit = (e) => {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (text && window.firebaseReady) {
+                const chatRef = window.FB_ref(window.FB_DB, 'chats');
+                window.FB_push(chatRef, {
+                    sender: player.name,
+                    text: text,
+                    time: Date.now()
+                });
+                input.value = '';
+            }
+            input.blur();
+            canvas.focus();
+        };
+    }
+
+    function closeAllModals() {
+        document.getElementById('modal-stats').classList.add('hidden');
+        document.getElementById('modal-inv').classList.add('hidden');
+        document.getElementById('modal-npc').classList.add('hidden');
+        document.getElementById('modal-confirm').classList.add('hidden');
+    }
+
+    // --- 8. MOVEMENT & COMBAT ---
+    function moveWithSliding(entity, dx, dy, radius = 16) {
+        let nextX = Math.max(radius + 10, Math.min(WORLD_WIDTH - radius - 10, entity.x + dx));
+        for (const obs of obstacles) {
+            const dist = Math.hypot(nextX - obs.x, entity.y - obs.y);
+            const minDist = radius + obs.r;
+            if (dist < minDist && dist > 0.001) nextX += ((nextX - obs.x) / dist) * (minDist - dist);
+        }
+        entity.x = nextX;
+
+        let nextY = Math.max(radius + 10, Math.min(WORLD_HEIGHT - radius - 10, entity.y + dy));
+        for (const obs of obstacles) {
+            const dist = Math.hypot(entity.x - obs.x, nextY - obs.y);
+            const minDist = radius + obs.r;
+            if (dist < minDist && dist > 0.001) nextY += ((nextY - obs.y) / dist) * (minDist - dist);
+        }
+        entity.y = nextY;
+    }
+
+    function faceTowards(tx, ty) {
+        const dx = tx - player.x;
+        const dy = ty - player.y;
+        if (Math.abs(dx) > Math.abs(dy)) player.dir = dx < 0 ? 1 : 2;
+        else player.dir = dy < 0 ? 3 : 0;
+    }
+
+    function getPlayerAttackPower() {
+        const cls = CLASSES[player.classId];
+        let base = cls.id === 'mage' ? player.int * 2.4 : (cls.id === 'archer' ? player.agi * 1.9 + player.str * 0.7 : player.str * 2.2);
+        base += player.weaponLevel * 12;
+        if (player.buffTimer > 0) base *= 1.35;
+        return Math.round(base);
+    }
+
+    function findNearestMonster(maxRange) {
+        let best = null, bestDist = maxRange;
+        for (const m of monsters) {
+            if (m.dead) continue;
+            const d = Math.hypot(m.x - player.x, m.y - player.y) - m.r;
+            if (d <= bestDist) { bestDist = d; best = m; }
+        }
+        return best;
+    }
+
+    function getDirectionVector(dir) {
+        if (dir === 1) return { x: -1, y: 0 };
+        if (dir === 2) return { x: 1, y: 0 };
+        if (dir === 3) return { x: 0, y: -1 };
+        return { x: 0, y: 1 };
+    }
+
+    function performBasicAttack() {
+        if (player.attackCooldown > 0) return;
+        const cls = CLASSES[player.classId];
+        player.attackCooldown = Math.max(0.28, 0.55 - player.agi * 0.008);
+        player.isAttacking = 0.22;
+
+        const target = findNearestMonster(cls.range + 45);
+        let aimVec = getDirectionVector(player.dir);
+        if (target) {
+            faceTowards(target.x, target.y);
+            const dist = Math.hypot(target.x - player.x, target.y - player.y) || 1;
+            aimVec = { x: (target.x - player.x) / dist, y: (target.y - player.y) / dist };
+        }
+
+        const atk = getPlayerAttackPower();
+        const isCrit = Math.random() < (0.08 + player.agi * 0.006);
+        const dmg = Math.round(atk * (isCrit ? 1.65 : 1.0) * (0.9 + Math.random() * 0.2));
+
+        if (cls.id === 'warrior') {
+            SoundFX.play('swing');
+            spawnBurstParticles(player.x + aimVec.x * 28, player.y + aimVec.y * 28, '#fde047', 10);
+            for (const m of monsters) {
+                if (!m.dead && Math.hypot(m.x - player.x, m.y - player.y) <= cls.range + m.r) damageMonster(m, dmg, isCrit);
+            }
+        } else if (cls.id === 'mage') {
+            SoundFX.play('magic');
+            projectiles.push({ x: player.x, y: player.y - 8, vx: aimVec.x * 460, vy: aimVec.y * 460, r: 9, color: '#38bdf8', dmg, isCrit, life: 0.75, aoe: 0 });
+        } else if (cls.id === 'archer') {
+            SoundFX.play('swing');
+            projectiles.push({ x: player.x, y: player.y - 8, vx: aimVec.x * 560, vy: aimVec.y * 560, r: 6, color: '#a3e635', dmg, isCrit, life: 0.65, aoe: 0, isArrow: true });
+        }
+        syncPlayerToFirebase(true);
+    }
+
+    function useSkill(index) {
+        const cls = CLASSES[player.classId];
+        const skill = cls.skills[index];
+        if (!skill || player.skillCooldowns[index] > 0) return;
+        if (player.mp < skill.mp) { showToast('💧 มานาไม่เพียงพอ!', 'text-sky-400'); return; }
+
+        player.mp -= skill.mp;
+        player.skillCooldowns[index] = skill.cd;
+        player.isAttacking = 0.3;
+        SoundFX.play('skill');
+        updateHUD();
+
+        const target = findNearestMonster(340);
+        let aimVec = getDirectionVector(player.dir);
+        if (target) {
+            faceTowards(target.x, target.y);
+            const dist = Math.hypot(target.x - player.x, target.y - player.y) || 1;
+            aimVec = { x: (target.x - player.x) / dist, y: (target.y - player.y) / dist };
+        }
+        const baseAtk = getPlayerAttackPower();
+
+        if (cls.id === 'warrior') {
+            if (index === 0) projectiles.push({ x: player.x, y: player.y - 6, vx: aimVec.x * 420, vy: aimVec.y * 420, r: 18, color: '#fbbf24', dmg: Math.round(baseAtk * 1.6), isCrit: true, life: 0.7, aoe: 40 });
+            else if (index === 1) {
+                spawnBurstParticles(player.x, player.y, '#f59e0b', 24);
+                for (const m of monsters) { if (!m.dead && Math.hypot(m.x - player.x, m.y - player.y) <= 135 + m.r) damageMonster(m, Math.round(baseAtk * 2.1), true); }
+            } else if (index === 2) {
+                const heal = Math.round(player.maxHp * 0.25);
+                player.hp = Math.min(player.maxHp, player.hp + heal);
+                player.buffTimer = 10;
+                spawnBurstParticles(player.x, player.y, '#ef4444', 20);
+                updateHUD();
+            }
+        } else if (cls.id === 'mage') {
+            if (index === 0) projectiles.push({ x: player.x, y: player.y - 8, vx: aimVec.x * 440, vy: aimVec.y * 440, r: 14, color: '#f97316', dmg: Math.round(baseAtk * 1.85), isCrit: true, life: 0.85, aoe: 95 });
+            else if (index === 1) {
+                spawnBurstParticles(player.x, player.y, '#38bdf8', 28);
+                for (const m of monsters) { if (!m.dead && Math.hypot(m.x - player.x, m.y - player.y) <= 175 + m.r) { m.slowTimer = 4; damageMonster(m, Math.round(baseAtk * 1.55), false); } }
+            } else if (index === 2) {
+                const sx = target ? target.x : player.x + aimVec.x * 160;
+                const sy = target ? target.y : player.y + aimVec.y * 160;
+                spawnBurstParticles(sx, sy, '#ef4444', 35);
+                for (const m of monsters) { if (!m.dead && Math.hypot(m.x - sx, m.y - sy) <= 145 + m.r) damageMonster(m, Math.round(baseAtk * 2.8), true); }
+            }
+        } else if (cls.id === 'archer') {
+            if (index === 0) {
+                const ba = Math.atan2(aimVec.y, aimVec.x);
+                [-0.22, 0, 0.22].forEach(offset => {
+                    const ang = ba + offset;
+                    projectiles.push({ x: player.x, y: player.y - 8, vx: Math.cos(ang) * 580, vy: Math.sin(ang) * 580, r: 7, color: '#4ade80', dmg: Math.round(baseAtk * 1.25), isCrit: true, life: 0.7, aoe: 0, isArrow: true });
+                });
+            } else if (index === 1) {
+                moveWithSliding(player, aimVec.x * 120, aimVec.y * 120, 16);
+                player.hp = Math.min(player.maxHp, player.hp + Math.round(player.maxHp * 0.15));
+                updateHUD();
+            } else if (index === 2) {
+                const cx = target ? target.x : player.x + aimVec.x * 180;
+                const cy = target ? target.y : player.y + aimVec.y * 180;
+                for (const m of monsters) { if (!m.dead && Math.hypot(m.x - cx, m.y - cy) <= 140 + m.r) damageMonster(m, Math.round(baseAtk * 2.4), true); }
+            }
+        }
+        syncPlayerToFirebase(true);
+    }
+
+    function damageMonster(m, dmg, isCrit) {
+        if (m.dead) return;
+        m.hp -= dmg;
+        m.hitFlash = 0.14;
+        SoundFX.play('hit');
+        spawnBurstParticles(m.x, m.y, m.color, 7);
+        addFloatingText(m.x, m.y - m.r - 8, isCrit ? `💥 ${dmg}!` : `${dmg}`, isCrit ? '#fbbf24' : '#ffffff');
+
+        if (m.hp <= 0) {
+            m.hp = 0; m.dead = true; m.respawnTimer = m.isBoss ? 25 : 8;
+            gainExp(m.exp);
+            drops.push({ x: m.x + (Math.random() - 0.5) * 20, y: m.y + (Math.random() - 0.5) * 20, type: 'gold', amount: m.gold, icon: '💰', life: 30 });
+            if (player.activeQuest && player.activeQuest.targetType === m.type) {
+                player.activeQuest.current = Math.min(player.activeQuest.required, player.activeQuest.current + 1);
+                updateQuestHUD();
+            }
+        }
+    }
+
+    function gainExp(amount) {
+        player.exp += amount;
+        addFloatingText(player.x, player.y - 45, `+${amount} EXP`, '#fde047');
+        while (player.exp >= player.maxExp) {
+            player.exp -= player.maxExp;
+            player.level += 1;
+            player.maxExp = Math.round(player.maxExp * 1.35);
+            player.statPoints += 3;
+            player.maxHp += 25; player.maxMp += 15;
+            player.hp = player.maxHp; player.mp = player.maxMp;
+            SoundFX.play('levelup');
+            showToast(`🌟 LEVEL UP! Lv.${player.level} (+3 แต้มสเตตัส)`, 'text-amber-300');
+            saveGame(false);
+        }
+        updateHUD();
+    }
+
+    function usePotion(itemId) {
+        const item = player.inventory.find(i => i.id === itemId);
+        if (!item || item.count <= 0) return;
+        if (itemId === 'hp_pot' && player.hp < player.maxHp) {
+            item.count -= 1; player.hp = Math.min(player.maxHp, player.hp + 100);
+            SoundFX.play('coin'); updateHUD();
+        } else if (itemId === 'mp_pot' && player.mp < player.maxMp) {
+            item.count -= 1; player.mp = Math.min(player.maxMp, player.mp + 60);
+            SoundFX.play('coin'); updateHUD();
+        }
+    }
+
+    function interactWithNearestNPC() {
+        for (const npc of npcs) {
+            if (Math.hypot(player.x - npc.x, player.y - npc.y) < 110) { openNPCModal(npc); return; }
+        }
+    }
+
+    function openNPCModal(npc) {
+        const modal = document.getElementById('modal-npc');
+        document.getElementById('npc-modal-icon').textContent = npc.icon;
+        document.getElementById('npc-modal-name').textContent = `${npc.name} (${npc.role})`;
+        const content = document.getElementById('npc-modal-content');
+        content.innerHTML = '';
+
+        if (npc.id === 'elder') {
+            document.getElementById('npc-modal-desc').textContent = 'อาณาจักรเอเธอร์เรียกำลังต้องการความช่วยเหลือจากผู้กล้า!';
+            if (player.activeQuest) {
+                const q = player.activeQuest;
+                const isDone = q.current >= q.required;
+                content.innerHTML = `
+                    <div class="bg-slate-900/90 p-3.5 rounded-xl border ${isDone ? 'border-emerald-400' : 'border-amber-500/40'}">
+                        <div class="font-bold text-amber-300 text-sm">📜 ${q.title}</div>
+                        <p class="text-xs text-slate-300 mt-1">${q.desc}</p>
+                        <div class="mt-2 text-xs font-bold ${isDone ? 'text-emerald-400' : 'text-sky-300'}">ความคืบหน้า: ${q.current} / ${q.required} ตัว</div>
+                        ${isDone ? `<button id="btn-claim-quest" type="button" class="fantasy-btn w-full mt-3 py-2 rounded-xl font-bold text-slate-950 text-xs cursor-pointer">🎁 ส่งเควสและรับรางวัล</button>` : ''}
+                    </div>
+                `;
+                if (isDone) {
+                    document.getElementById('btn-claim-quest').onclick = () => {
+                        player.gold += q.rewardGold;
+                        player.completedQuests.push(q.id);
+                        player.activeQuest = null;
+                        gainExp(q.rewardExp);
+                        updateQuestHUD(); saveGame(false); openNPCModal(npc);
+                    };
+                }
+            } else {
+                const nextQ = QUESTS_DATA.find(q => !player.completedQuests.includes(q.id)) || QUESTS_DATA[3];
+                content.innerHTML = `
+                    <div class="bg-slate-900/90 p-3.5 rounded-xl border border-amber-500/40">
+                        <div class="font-bold text-amber-300 text-sm">📜 เควส: ${nextQ.title}</div>
+                        <p class="text-xs text-slate-300 mt-1">${nextQ.desc}</p>
+                        <button id="btn-accept-quest" type="button" class="fantasy-btn w-full mt-3 py-2 rounded-xl font-bold text-slate-950 text-xs cursor-pointer">✅ รับภารกิจ</button>
+                    </div>
+                `;
+                document.getElementById('btn-accept-quest').onclick = () => {
+                    player.activeQuest = { ...nextQ, current: 0 };
+                    updateQuestHUD(); closeAllModals();
+                };
+            }
+        } else if (npc.id === 'merchant') {
+            document.getElementById('npc-modal-desc').textContent = 'ร้านค้าโพชั่นฟื้นพลัง';
+            [ { id: 'hp_pot', name: 'โพชั่น HP', icon: '🧪', price: 30 }, { id: 'mp_pot', name: 'โพชั่น MP', icon: '⚗️', price: 25 } ].forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center justify-between bg-slate-900/90 p-3 rounded-xl border border-slate-700';
+                row.innerHTML = `<div class="flex items-center gap-2"><span class="text-2xl">${item.icon}</span><span class="text-amber-200 font-bold">${item.name} (${item.price} G)</span></div><button class="fantasy-btn px-3 py-1.5 rounded-xl text-xs font-bold text-slate-950">ซื้อ</button>`;
+                row.querySelector('button').onclick = () => {
+                    if (player.gold >= item.price) {
+                        player.gold -= item.price;
+                        player.inventory.find(i => i.id === item.id).count += 1;
+                        updateHUD(); openNPCModal(npc);
+                    }
+                };
+                content.appendChild(row);
+            });
+        } else if (npc.id === 'blacksmith') {
+            const cost = (player.weaponLevel + 1) * 100;
+            document.getElementById('npc-modal-desc').textContent = 'ตีบวกอาวุธเพิ่มพลังโจมตี';
+            content.innerHTML = `<div class="bg-slate-900/90 p-4 rounded-xl border border-amber-500/40 text-center"><div class="font-bold text-amber-300">อาวุธ +${player.weaponLevel}</div><div class="text-yellow-400 text-xs mt-1">ค่าใช้จ่าย: ${cost} G</div><button id="btn-up" class="fantasy-btn w-full mt-3 py-2 rounded-xl font-bold text-slate-950 text-xs">🔥 ตีบวก</button></div>`;
+            content.querySelector('button').onclick = () => {
+                if (player.gold >= cost) {
+                    player.gold -= cost; player.weaponLevel += 1;
+                    updateHUD(); saveGame(false); openNPCModal(npc);
+                }
+            };
+        }
+        modal.classList.remove('hidden');
+    }
+
+    function updateHUD() {
+        const cls = CLASSES[player.classId];
+        document.getElementById('hud-name').textContent = player.name;
+        document.getElementById('hud-level').textContent = `Lv.${player.level}`;
+        document.getElementById('hud-class').textContent = cls.shortName;
+        document.getElementById('hud-gold').textContent = player.gold;
+
+        document.getElementById('bar-hp').style.width = `${Math.max(0, Math.min(100, (player.hp / player.maxHp) * 100))}%`;
+        document.getElementById('text-hp').textContent = `${Math.ceil(player.hp)} / ${player.maxHp}`;
+        document.getElementById('bar-mp').style.width = `${Math.max(0, Math.min(100, (player.mp / player.maxMp) * 100))}%`;
+        document.getElementById('text-mp').textContent = `${Math.ceil(player.mp)} / ${player.maxMp}`;
+        document.getElementById('bar-exp').style.width = `${Math.max(0, Math.min(100, (player.exp / player.maxExp) * 100))}%`;
+        document.getElementById('text-exp').textContent = `EXP: ${player.exp} / ${player.maxExp}`;
+
+        const hpPot = player.inventory.find(i => i.id === 'hp_pot');
+        const mpPot = player.inventory.find(i => i.id === 'mp_pot');
+        document.getElementById('hud-hppot-count').textContent = `x${hpPot ? hpPot.count : 0}`;
+        document.getElementById('hud-mppot-count').textContent = `x${mpPot ? mpPot.count : 0}`;
+    }
+
+    function updateSkillBarUI() {
+        const cls = CLASSES[player.classId];
+        document.getElementById('skill-icon-0').textContent = cls.id === 'mage' ? '🪄' : (cls.id === 'archer' ? '🏹' : '⚔️');
+        cls.skills.forEach((sk, idx) => {
+            document.getElementById(`skill-icon-${idx + 1}`).textContent = sk.icon;
+            document.getElementById(`skill-name-${idx + 1}`).textContent = sk.name;
+        });
+    }
+
+    function updateQuestHUD() {
+        const box = document.getElementById('hud-quest-box');
+        if (!player.activeQuest) { box.classList.add('hidden'); return; }
+        box.classList.remove('hidden');
+        document.getElementById('hud-quest-title').textContent = player.activeQuest.title;
+        document.getElementById('hud-quest-progress').textContent = `${player.activeQuest.current} / ${player.activeQuest.required} ตัว`;
+    }
+
+    function openStatsModal() {
+        document.getElementById('modal-stat-points').textContent = player.statPoints;
+        document.getElementById('modal-val-str').textContent = player.str;
+        document.getElementById('modal-val-int').textContent = player.int;
+        document.getElementById('modal-val-agi').textContent = player.agi;
+        document.getElementById('modal-val-vit').textContent = player.vit;
+        document.getElementById('modal-total-atk').textContent = getPlayerAttackPower();
+        document.getElementById('modal-weapon-lv').textContent = `+${player.weaponLevel}`;
+        document.getElementById('modal-crit-rate').textContent = `${Math.round((0.08 + player.agi * 0.006) * 100)}%`;
+        document.getElementById('modal-def').textContent = player.vit;
+        document.getElementById('modal-stats').classList.remove('hidden');
+    }
+
+    function openInventoryModal() {
+        document.getElementById('inv-gold').textContent = player.gold;
+        const grid = document.getElementById('inv-grid');
+        grid.innerHTML = '';
+        player.inventory.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'bg-slate-900/90 border border-slate-700 rounded-xl p-3 flex flex-col justify-between';
+            card.innerHTML = `<div class="flex items-center gap-2"><span class="text-2xl">${item.icon}</span><div><div class="font-bold text-xs text-amber-200">${item.name}</div><div class="text-[11px] text-emerald-400 font-bold">x${item.count}</div></div></div><button class="mt-2 py-1 rounded-lg bg-amber-600 text-white text-xs font-bold">ใช้</button>`;
+            card.querySelector('button').onclick = () => { usePotion(item.id); openInventoryModal(); };
+            grid.appendChild(card);
+        });
+        document.getElementById('modal-inv').classList.remove('hidden');
+    }
+
+    function addChatMessage(sender, text, colorClass = 'text-slate-200') {
+        const container = document.getElementById('chat-messages');
+        const div = document.createElement('div');
+        div.className = colorClass;
+        div.innerHTML = `<span class="font-bold">[${sender}]</span> ${text}`;
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function showToast(message, colorClass = 'text-amber-300') {
+        const container = document.getElementById('toast-container');
+        const el = document.createElement('div');
+        el.className = `fantasy-panel px-4 py-1.5 rounded-full text-xs font-bold ${colorClass} shadow-xl`;
+        el.textContent = message;
+        container.appendChild(el);
+        setTimeout(() => el.remove(), 2400);
+    }
+
+    function addFloatingText(x, y, text, color = '#ffffff') {
+        floatingTexts.push({ x, y, text, color, life: 1.0, vy: -38 });
+    }
+
+    function spawnBurstParticles(x, y, color, count = 12) {
+        for (let i = 0; i < count; i++) {
+            const ang = Math.random() * Math.PI * 2, spd = 40 + Math.random() * 140;
+            particles.push({ x, y, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, r: 2.5 + Math.random() * 3, color, life: 0.4 + Math.random() * 0.35, maxLife: 0.75 });
+        }
+    }
+
+    // --- 9. MAIN LOOP & RENDERING ---
+    let lastTime = 0;
+
+    function updateWorld(dt) {
+        let moveX = 0, moveY = 0;
+        if (keys['KeyW'] || keys['ArrowUp']) moveY -= 1;
+        if (keys['KeyS'] || keys['ArrowDown']) moveY += 1;
+        if (keys['KeyA'] || keys['ArrowLeft']) moveX -= 1;
+        if (keys['KeyD'] || keys['ArrowRight']) moveX += 1;
+
+        moveX += joystickVec.x + dpadVec.x;
+        moveY += joystickVec.y + dpadVec.y;
+
+        const moveSpeed = 215 + player.agi * 2.5;
+        let isMoving = false;
+
+        if (Math.hypot(moveX, moveY) > 0.08) {
+            const mag = Math.hypot(moveX, moveY);
+            moveWithSliding(player, (moveX / mag) * moveSpeed * dt, (moveY / mag) * moveSpeed * dt, 16);
+            isMoving = true;
+            if (Math.abs(moveX) > Math.abs(moveY)) player.dir = moveX < 0 ? 1 : 2;
+            else player.dir = moveY < 0 ? 3 : 0;
+        } else if (targetPos) {
+            const dx = targetPos.x - player.x, dy = targetPos.y - player.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist > 8) {
+                moveWithSliding(player, (dx / dist) * moveSpeed * dt, (dy / dist) * moveSpeed * dt, 16);
+                isMoving = true;
+                faceTowards(targetPos.x, targetPos.y);
+            } else {
+                if (targetPos.openNpcId) {
+                    const npc = npcs.find(n => n.id === targetPos.openNpcId);
+                    if (npc) openNPCModal(npc);
+                }
+                targetPos = null;
+            }
+        }
+
+        if (isMoving) {
+            player.animFrame += dt * 36;
+            syncPlayerToFirebase(false);
+        } else {
+            player.animFrame = 0;
+        }
+
+        if (player.attackCooldown > 0) player.attackCooldown = Math.max(0, player.attackCooldown - dt);
+        if (player.isAttacking > 0) player.isAttacking = Math.max(0, player.isAttacking - dt);
+        if (player.buffTimer > 0) player.buffTimer = Math.max(0, player.buffTimer - dt);
+
+        for (let i = 0; i < 3; i++) {
+            const cdEl = document.getElementById(`skill-cd-${i + 1}`);
+            if (player.skillCooldowns[i] > 0) {
+                player.skillCooldowns[i] = Math.max(0, player.skillCooldowns[i] - dt);
+                cdEl.classList.remove('hidden'); cdEl.textContent = player.skillCooldowns[i].toFixed(1);
+            } else cdEl.classList.add('hidden');
+        }
+
+        // Regen
+        const inTown = player.x < 1200 && player.y < 1200;
+        const regenMult = inTown ? 3.5 : 1.0;
+        if (player.hp < player.maxHp || player.mp < player.maxMp) {
+            player.hp = Math.min(player.maxHp, player.hp + 2.5 * regenMult * dt);
+            player.mp = Math.min(player.maxMp, player.mp + 3.0 * regenMult * dt);
+            updateHUD();
+        }
+
+        // Zone
+        const currentZone = ZONES.find(z => player.x >= z.x && player.x < z.x + z.w && player.y >= z.y && player.y < z.y + z.h) || ZONES[0];
+        document.getElementById('hud-zone-name').textContent = currentZone.name;
+
+        let nearNpc = null;
+        for (const npc of npcs) { if (Math.hypot(player.x - npc.x, player.y - npc.y) < 105) { nearNpc = npc; break; } }
+        const interactBtn = document.getElementById('btn-interact-npc');
+        if (nearNpc) { interactBtn.classList.remove('hidden'); document.getElementById('nearby-npc-name').textContent = nearNpc.name; }
+        else interactBtn.classList.add('hidden');
+
+        // Monsters
+        for (const m of monsters) {
+            if (m.dead) {
+                m.respawnTimer -= dt;
+                if (m.respawnTimer <= 0) { m.dead = false; m.hp = m.maxHp; m.x = m.spawnX; m.y = m.spawnY; }
+                continue;
+            }
+            if (m.hitFlash > 0) m.hitFlash = Math.max(0, m.hitFlash - dt);
+            if (m.atkCooldown > 0) m.atkCooldown = Math.max(0, m.atkCooldown - dt);
+
+            const dist = Math.hypot(player.x - m.x, player.y - m.y);
+            if (!inTown && dist < (m.isBoss ? 320 : 220)) {
+                if (dist > m.r + 22) {
+                    moveWithSliding(m, ((player.x - m.x) / dist) * m.speed * dt, ((player.y - m.y) / dist) * m.speed * dt, m.r);
+                } else if (m.atkCooldown <= 0) {
+                    m.atkCooldown = 1.35;
+                    const dmg = Math.max(2, m.atk - Math.floor(player.vit * 0.4));
+                    player.hp = Math.max(0, player.hp - dmg);
+                    updateHUD();
+                    if (player.hp <= 0) {
+                        player.hp = player.maxHp; player.x = 800; player.y = 800;
+                        showToast('💫 คุณหมดสติและถูกส่งกลับเมือง!', 'text-rose-300');
                     }
                 }
-            });
-
-            // เช็คคลิกคุย NPC
-            npcs.forEach(n => {
-                let dist = Math.hypot(n.x - worldClickX, n.y - worldClickY);
-                if (dist < 30) {
-                    alert(`[ระบบ ${n.name}] ยินดีต้อนรับนักล่า ${playerData.name}! จงกำจัดมอนสเตอร์ในดินแดนนี้ให้สิ้นซาก!`);
-                }
-            });
-
-            if (!clickedMonster) {
-                targetPos = { x: worldClickX, y: worldClickY };
             }
-        });
-
-        function startOnlineGame() {
-            const name = document.getElementById('input-name').value || 'Hunter';
-            const charClass = document.getElementById('input-class').value;
-            const color = document.getElementById('input-color').value;
-
-            playerData = {
-                id: myPlayerId,
-                name: name,
-                charClass: charClass,
-                color: color,
-                x: 1500 + Math.random() * 100 - 50,
-                y: 1500 + Math.random() * 100 - 50,
-                hp: 100,
-                maxHp: 100,
-                level: 1,
-                gold: 0,
-                exp: 0
-            };
-
-            document.getElementById('create-screen').style.display = 'none';
-            document.getElementById('hud').style.display = 'block';
-
-            document.getElementById('hud-name').innerText = playerData.name;
-            document.getElementById('hud-class').innerText = playerData.charClass;
-
-            initFirebaseMultiplayer();
-            requestAnimationFrame(gameLoop);
         }
 
-        function initFirebaseMultiplayer() {
-            const playerRef = window.ref(window.db, 'players/' + myPlayerId);
-            window.set(playerRef, playerData);
-            window.onDisconnect(playerRef).remove();
-
-            const allPlayersRef = window.ref(window.db, 'players');
-            window.onValue(allPlayersRef, (snapshot) => {
-                const data = snapshot.val();
-                if (data) otherPlayers = data;
-                else otherPlayers = {};
-            });
-
-            const chatRef = window.ref(window.db, 'chats');
-            window.onValue(chatRef, (snapshot) => {
-                const data = snapshot.val();
-                const chatBox = document.getElementById('chat-messages');
-                chatBox.innerHTML = '';
-                if (data) {
-                    Object.values(data).slice(-20).forEach(chat => {
-                        const div = document.createElement('div');
-                        div.className = 'chat-msg';
-                        div.innerHTML = `<b style="color: #66fcf1;">${chat.name}</b>: ${chat.text}`;
-                        chatBox.appendChild(div);
-                    });
-                    chatBox.scrollTop = chatBox.scrollHeight;
-                }
-            });
-        }
-
-        function handleChatInput(e) {
-            if (e.key === 'Enter') {
-                const input = document.getElementById('chat-input');
-                const text = input.value.trim();
-                if (text && playerData) {
-                    const chatRef = window.ref(window.db, 'chats');
-                    window.push(chatRef, { name: playerData.name, text: text, time: Date.now() });
-                    input.value = '';
+        // Projectiles
+        for (let i = projectiles.length - 1; i >= 0; i--) {
+            const p = projectiles[i];
+            p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt;
+            let hit = false;
+            for (const m of monsters) {
+                if (!m.dead && Math.hypot(p.x - m.x, p.y - m.y) <= p.r + m.r) {
+                    hit = true; damageMonster(m, p.dmg, p.isCrit); break;
                 }
             }
+            if (hit || p.life <= 0) projectiles.splice(i, 1);
         }
 
-        let lastSyncTime = 0;
-        function updatePlayer() {
-            if (!playerData) return;
-            let speed = 4;
-            let moved = false;
-
-            if (keys['KeyW'] || keys['ArrowUp']) { playerData.y -= speed; moved = true; targetPos = null; }
-            if (keys['KeyS'] || keys['ArrowDown']) { playerData.y += speed; moved = true; targetPos = null; }
-            if (keys['KeyA'] || keys['ArrowLeft']) { playerData.x -= speed; moved = true; targetPos = null; }
-            if (keys['KeyD'] || keys['ArrowRight']) { playerData.x += speed; moved = true; targetPos = null; }
-
-            if (targetPos) {
-                let dx = targetPos.x - playerData.x;
-                let dy = targetPos.y - playerData.y;
-                let dist = Math.hypot(dx, dy);
-                if (dist > 4) {
-                    playerData.x += (dx / dist) * speed;
-                    playerData.y += (dy / dist) * speed;
-                    moved = true;
-                } else {
-                    targetPos = null;
-                }
-            }
-
-            playerData.x = Math.max(50, Math.min(WORLD_SIZE - 50, playerData.x));
-            playerData.y = Math.max(50, Math.min(WORLD_SIZE - 50, playerData.y));
-
-            let now = Date.now();
-            if (moved && (now - lastSyncTime > 50)) {
-                const playerRef = window.ref(window.db, 'players/' + myPlayerId);
-                window.update(playerRef, { x: playerData.x, y: playerData.y });
-                lastSyncTime = now;
+        // Drops
+        for (let i = drops.length - 1; i >= 0; i--) {
+            const d = drops[i]; d.life -= dt;
+            if (Math.hypot(player.x - d.x, player.y - d.y) < 38) {
+                if (d.type === 'gold') player.gold += d.amount;
+                updateHUD(); drops.splice(i, 1);
             }
         }
 
-        function drawWorld() {
-            ctx.fillStyle = '#0b0c10';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            if (!playerData) return;
-
-            ctx.save();
-            ctx.translate(canvas.width / 2 - playerData.x, canvas.height / 2 - playerData.y);
-
-            // พื้นหลังกริด
-            ctx.strokeStyle = '#1f2833';
-            ctx.lineWidth = 2;
-            let gridSize = 100;
-            for (let x = 0; x <= WORLD_SIZE; x += gridSize) {
-                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, WORLD_SIZE); ctx.stroke();
-            }
-            for (let y = 0; y <= WORLD_SIZE; y += gridSize) {
-                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(WORLD_SIZE, y); ctx.stroke();
-            }
-
-            // ขอบเขตโลก
-            ctx.strokeStyle = '#66fcf1';
-            ctx.lineWidth = 5;
-            ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
-
-            // วาด NPC
-            npcs.forEach(n => {
-                ctx.fillStyle = n.color;
-                ctx.beginPath();
-                ctx.arc(n.x, n.y, 18, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = '#fff';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-
-                ctx.fillStyle = '#f1c40f';
-                ctx.font = 'bold 12px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText(`⭐ ${n.name}`, n.x, n.y - 24);
-            });
-
-            // วาดมอนสเตอร์
-            monsters.forEach(m => {
-                ctx.fillStyle = m.color;
-                ctx.beginPath();
-                ctx.arc(m.x, m.y, m.radius, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = '#fff';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-
-                // เลือดมอนสเตอร์
-                ctx.fillStyle = 'red';
-                ctx.fillRect(m.x - 20, m.y - m.radius - 12, 40, 5);
-                ctx.fillStyle = 'green';
-                ctx.fillRect(m.x - 20, m.y - m.radius - 12, 40 * (m.hp / m.maxHp), 5);
-
-                ctx.fillStyle = '#fff';
-                ctx.font = '11px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText(m.name, m.x, m.y - m.radius - 16);
-            });
-
-            // วาดผู้เล่นทั้งหมด
-            for (let id in otherPlayers) {
-                let p = otherPlayers[id];
-                ctx.save();
-                ctx.translate(p.x, p.y);
-
-                ctx.beginPath();
-                ctx.arc(0, 0, 22, 0, Math.PI * 2);
-                ctx.fillStyle = p.color || '#66fcf1';
-                ctx.globalAlpha = 0.3;
-                ctx.fill();
-                ctx.globalAlpha = 1.0;
-
-                ctx.beginPath();
-                ctx.arc(0, 0, 16, 0, Math.PI * 2);
-                ctx.fillStyle = p.color || '#66fcf1';
-                ctx.fill();
-                ctx.lineWidth = 3;
-                ctx.strokeStyle = '#ffffff';
-                ctx.stroke();
-
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 13px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText(`${p.name} (Lv.${p.level || 1})`, 0, -26);
-
-                ctx.restore();
-            }
-
-            ctx.restore();
+        // Particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+            particles[i].x += particles[i].vx * dt; particles[i].y += particles[i].vy * dt; particles[i].life -= dt;
+            if (particles[i].life <= 0) particles.splice(i, 1);
+        }
+        for (let i = floatingTexts.length - 1; i >= 0; i--) {
+            floatingTexts[i].y += floatingTexts[i].vy * dt; floatingTexts[i].life -= dt;
+            if (floatingTexts[i].life <= 0) floatingTexts.splice(i, 1);
         }
 
-        function drawMinimap() {
-            miniCtx.fillStyle = '#0b0c10';
-            miniCtx.fillRect(0, 0, minimapCanvas.width, minimapCanvas.height);
+        camera.x += (player.x - camera.x) * Math.min(1, dt * 12);
+        camera.y += (player.y - camera.y) * Math.min(1, dt * 12);
+    }
 
-            if (!playerData) return;
-            let scale = minimapCanvas.width / WORLD_SIZE;
+    function renderWorld() {
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const w = canvas.width, h = canvas.height;
 
-            // มอนสเตอร์บนมินิแมป
-            monsters.forEach(m => {
-                miniCtx.fillStyle = '#e74c3c';
-                miniCtx.fillRect(m.x * scale - 2, m.y * scale - 2, 4, 4);
-            });
+        ctx.clearRect(0, 0, w, h);
+        ctx.save();
+        ctx.translate(w / 2 - camera.x, h / 2 - camera.y);
 
-            // ผู้เล่นบนมินิแมป
-            for (let id in otherPlayers) {
-                let p = otherPlayers[id];
-                miniCtx.fillStyle = p.id === myPlayerId ? '#66fcf1' : '#f39c12';
-                miniCtx.beginPath();
-                miniCtx.arc(p.x * scale, p.y * scale, p.id === myPlayerId ? 4 : 2.5, 0, Math.PI * 2);
-                miniCtx.fill();
+        // Zones
+        for (const z of ZONES) {
+            ctx.fillStyle = z.bg; ctx.fillRect(z.x, z.y, z.w, z.h);
+        }
+
+        // Town Plaza
+        ctx.fillStyle = '#57534e';
+        ctx.beginPath(); ctx.roundRect(580, 520, 440, 420, 32); ctx.fill();
+
+        // Obstacles
+        for (const obs of obstacles) {
+            if (obs.type === 'fountain') {
+                ctx.fillStyle = '#94a3b8'; ctx.beginPath(); ctx.arc(obs.x, obs.y, obs.r, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#0ea5e9'; ctx.beginPath(); ctx.arc(obs.x, obs.y, obs.r - 8, 0, Math.PI * 2); ctx.fill();
+            } else if (obs.type === 'tree') {
+                ctx.fillStyle = '#5c3a21'; ctx.fillRect(obs.x - 6, obs.y - 4, 12, 22);
+                ctx.fillStyle = '#15803d'; ctx.beginPath(); ctx.arc(obs.x, obs.y - 16, obs.r + 6, 0, Math.PI * 2); ctx.fill();
             }
         }
 
-        function gameLoop() {
-            updatePlayer();
-            drawWorld();
-            drawMinimap();
-            requestAnimationFrame(gameLoop);
+        // NPCs
+        for (const npc of npcs) {
+            drawCharacterSprite(ctx, npc.x, npc.y, { appearance: { skin: '#f1c27d', hairStyle: 'long', hairColor: '#fff', outfitColor: '#7c3aed' }, dir: 0 }, 1.05, false);
+            ctx.textAlign = 'center'; ctx.font = 'bold 12px Kanit';
+            ctx.fillStyle = '#38bdf8'; ctx.fillText(`${npc.icon} ${npc.name}`, npc.x, npc.y - 36);
         }
+
+        // Monsters
+        for (const m of monsters) {
+            if (m.dead) continue;
+            ctx.fillStyle = m.hitFlash > 0 ? '#fff' : m.color;
+            ctx.beginPath(); ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 11px Kanit'; ctx.textAlign = 'center';
+            ctx.fillText(m.name, m.x, m.y - m.r - 12);
+        }
+
+        // RENDER OTHER ONLINE PLAYERS (MULTIPLAYER FIREBASE SYNC)
+        for (const id in remotePlayers) {
+            const rp = remotePlayers[id];
+            if (rp && rp.id !== myPlayerId) {
+                drawCharacterSprite(ctx, rp.x || 800, rp.y || 800, rp, 1.0, rp.isAttacking === 1);
+                ctx.textAlign = 'center'; ctx.font = 'bold 12px Kanit';
+                ctx.fillStyle = '#67e8f9';
+                ctx.fillText(`Lv.${rp.level || 1} ${rp.name || 'ผู้เล่น'}`, rp.x || 800, (rp.y || 800) - 38);
+            }
+        }
+
+        // Main Player
+        renderPlayer(ctx);
+
+        // Projectiles & Particles
+        for (const p of projectiles) {
+            ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+        }
+        for (const pt of particles) {
+            ctx.fillStyle = pt.color; ctx.beginPath(); ctx.arc(pt.x, pt.y, pt.r, 0, Math.PI * 2); ctx.fill();
+        }
+        for (const ft of floatingTexts) {
+            ctx.fillStyle = ft.color; ctx.font = 'bold 14px Kanit'; ctx.textAlign = 'center'; ctx.fillText(ft.text, ft.x, ft.y);
+        }
+
+        ctx.restore();
+        renderMinimap();
+    }
+
+    function renderPlayer(ctx) {
+        drawCharacterSprite(ctx, player.x, player.y, player, 1.08, player.isAttacking > 0);
+        ctx.textAlign = 'center'; ctx.font = 'bold 12px Kanit';
+        ctx.fillStyle = '#fde047';
+        ctx.fillText(`Lv.${player.level} ${player.name}`, player.x, player.y - 38);
+    }
+
+    function renderMinimap() {
+        const mmCanvas = document.getElementById('minimap-canvas');
+        const mCtx = mmCanvas.getContext('2d');
+        const mw = mmCanvas.width, mh = mmCanvas.height;
+        const scaleX = mw / WORLD_WIDTH, scaleY = mh / WORLD_HEIGHT;
+
+        mCtx.clearRect(0, 0, mw, mh);
+        for (const z of ZONES) {
+            mCtx.fillStyle = z.bg; mCtx.fillRect(z.x * scaleX, z.y * scaleY, z.w * scaleX, z.h * scaleY);
+        }
+        // Other online players on minimap
+        for (const id in remotePlayers) {
+            const rp = remotePlayers[id];
+            if (rp) {
+                mCtx.fillStyle = '#67e8f9';
+                mCtx.beginPath(); mCtx.arc((rp.x || 800) * scaleX, (rp.y || 800) * scaleY, 2.5, 0, Math.PI * 2); mCtx.fill();
+            }
+        }
+        // Main player
+        mCtx.fillStyle = '#fde047';
+        mCtx.beginPath(); mCtx.arc(player.x * scaleX, player.y * scaleY, 3.5, 0, Math.PI * 2); mCtx.fill();
+    }
+
+    function gameLoop(now) {
+        const dt = Math.min(0.05, (now - lastTime) / 1000);
+        lastTime = now;
+        if (gameState === 'PLAYING') {
+            updateWorld(dt);
+            renderWorld();
+        }
+        requestAnimationFrame(gameLoop);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => { initCreationUI(); });
     </script>
 </body>
 </html>
