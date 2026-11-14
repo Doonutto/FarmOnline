@@ -13,19 +13,19 @@
         
         /* Screens */
         .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, #1f2833 0%, #0b0c10 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; }
-        .panel { background: rgba(31, 40, 51, 0.95); border: 2px solid #66fcf1; border-radius: 12px; padding: 30px; width: 420px; box-shadow: 0 0 25px rgba(102, 252, 241, 0.3); text-align: center; }
-        h1 { color: #66fcf1; font-size: 28px; margin-bottom: 20px; text-shadow: 0 0 10px rgba(102,252,241,0.5); letter-spacing: 2px; }
+        .panel { background: rgba(31, 40, 51, 0.95); border: 2px solid #66fcf1; border-radius: 12px; padding: 25px; width: 440px; box-shadow: 0 0 25px rgba(102, 252, 241, 0.3); text-align: center; }
+        h1 { color: #66fcf1; font-size: 26px; margin-bottom: 15px; text-shadow: 0 0 10px rgba(102,252,241,0.5); letter-spacing: 2px; }
         
-        .form-group { margin-bottom: 15px; text-align: left; }
-        label { display: block; font-size: 13px; color: #45a29e; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], select { width: 100%; padding: 10px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 6px; font-size: 15px; }
+        .form-group { margin-bottom: 12px; text-align: left; }
+        label { display: block; font-size: 12px; color: #45a29e; margin-bottom: 4px; font-weight: bold; }
+        input[type="text"], select { width: 100%; padding: 8px; background: #0b0c10; border: 1px solid #45a29e; color: #fff; border-radius: 6px; font-size: 14px; }
         
         .color-picker-row { display: flex; gap: 10px; align-items: center; }
-        input[type="color"] { -webkit-appearance: none; border: none; width: 40px; height: 40px; border-radius: 6px; cursor: pointer; background: none; }
+        input[type="color"] { -webkit-appearance: none; border: none; width: 36px; height: 36px; border-radius: 6px; cursor: pointer; background: none; }
         input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
         input[type="color"]::-webkit-color-swatch { border: 1px solid #45a29e; border-radius: 6px; }
 
-        .btn { background: #66fcf1; color: #0b0c10; font-weight: bold; padding: 12px; width: 100%; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; transition: 0.2s; margin-top: 10px; box-shadow: 0 0 10px rgba(102,252,241,0.4); }
+        .btn { background: #66fcf1; color: #0b0c10; font-weight: bold; padding: 10px; width: 100%; border: none; border-radius: 6px; font-size: 15px; cursor: pointer; transition: 0.2s; margin-top: 8px; box-shadow: 0 0 10px rgba(102,252,241,0.4); }
         .btn:hover { background: #45a29e; color: #fff; transform: translateY(-2px); }
 
         /* HUD */
@@ -91,6 +91,7 @@
                 <div style="font-size: 11px; color: #45a29e; margin-bottom: 4px;" id="hud-class">Blade Master</div>
                 <div style="font-size: 11px; display: flex; justify-content: space-between;"><span>HP</span><span id="hud-hp-text">100/100</span></div>
                 <div class="bar-container"><div id="hp-bar"></div></div>
+                <div style="margin-top: 6px; font-size: 11px; color: #f39c12;">ทอง: <span id="hud-gold">0</span> G | EXP: <span id="hud-exp">0</span></div>
             </div>
             <div id="minimap-box">
                 <canvas id="minimapCanvas" width="160" height="160"></canvas>
@@ -104,8 +105,8 @@
 
         <div id="controls-hint">
             <b>WASD / ลูกศร</b> : เดิน<br>
-            <b>คลิกเมาส์ซ้าย</b> : เดินตามตำแหน่ง<br>
-            <b>Firebase Multiplayer</b> : ออนไลน์ร่วมกับผู้อื่นทันที
+            <b>คลิกซ้าย</b> : โจมตีมอนสเตอร์ / เดิน<br>
+            <b>พื้นที่เมือง</b> : คุย NPC เควส/ร้านค้า
         </div>
     </div>
 
@@ -116,7 +117,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue, update, remove, onDisconnect, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // ตั้งค่า Firebase สาธารณะสำหรับทดสอบระบบ Multiplayer ทันที
+        // URL ฐานข้อมูลของคุณ (อัปเดตตามที่ตั้งค่า Firebase)
         const firebaseConfig = {
             databaseURL: "https://mmorpg-dmhunteronline-default-rtdb.asia-southeast1.firebasedatabase.app/"
         };
@@ -156,22 +157,73 @@
 
         const WORLD_SIZE = 3000;
 
-        // ควบคุมคีย์บอร์ด
+        // NPC และ มอนสเตอร์ในเกม
+        const npcs = [
+            { id: 'npc1', name: 'ผู้เฒ่าเอเดน (เควส)', x: 1400, y: 1400, color: '#f39c12', type: 'quest' },
+            { id: 'npc2', name: 'แม่ค้าลิลลี่ (ร้านค้า)', x: 1600, y: 1400, color: '#e84393', type: 'shop' },
+            { id: 'npc3', name: 'ช่างตีเหล็กบรอนซ์', x: 1500, y: 1300, color: '#fdcb6e', type: 'smith' }
+        ];
+
+        let monsters = [
+            { id: 'm1', name: 'Slime พิษ', x: 1200, y: 1200, hp: 30, maxHp: 30, color: '#00b894', radius: 14 },
+            { id: 'm2', name: 'Imp ร้าย', x: 1800, y: 1600, hp: 50, maxHp: 50, color: '#d63031', radius: 16 },
+            { id: 'm3', name: 'Demon Guard', x: 2000, y: 1200, hp: 100, maxHp: 100, color: '#6c5ce7', radius: 20 }
+        ];
+
         window.addEventListener('keydown', e => { keys[e.code] = true; });
         window.addEventListener('keyup', e => { keys[e.code] = false; });
 
-        // คลิกเมาส์เดิน
+        // คลิกเมาส์เดินหรือโจมตี
         canvas.addEventListener('click', e => {
             if (!playerData) return;
             const rect = canvas.getBoundingClientRect();
             const clickX = e.clientX - rect.left;
             const clickY = e.clientY - rect.top;
             
-            // แปลงพิกัดหน้าจอเป็นพิกัดโลก
             const worldClickX = clickX - canvas.width / 2 + playerData.x;
             const worldClickY = clickY - canvas.height / 2 + playerData.y;
-            
-            targetPos = { x: worldClickX, y: worldClickY };
+
+            // เช็คคลิกตบมอนสเตอร์
+            let clickedMonster = false;
+            monsters.forEach(m => {
+                let dist = Math.hypot(m.x - worldClickX, m.y - worldClickY);
+                let pDist = Math.hypot(m.x - playerData.x, m.y - playerData.y);
+                if (dist < 30) {
+                    clickedMonster = true;
+                    if (pDist < 80) {
+                        // โจมตีมอนสเตอร์
+                        m.hp -= 20;
+                        if (m.hp <= 0) {
+                            m.hp = m.maxHp;
+                            m.x = playerData.x + (Math.random() * 400 - 200);
+                            m.y = playerData.y + (Math.random() * 400 - 200);
+                            playerData.gold = (playerData.gold || 0) + 15;
+                            playerData.exp = (playerData.exp || 0) + 25;
+                            if (playerData.exp >= 100) {
+                                playerData.level = (playerData.level || 1) + 1;
+                                playerData.exp = 0;
+                                document.getElementById('hud-level').innerText = 'Lv.' + playerData.level;
+                            }
+                            document.getElementById('hud-gold').innerText = playerData.gold;
+                            document.getElementById('hud-exp').innerText = playerData.exp;
+                        }
+                    } else {
+                        targetPos = { x: m.x, y: m.y };
+                    }
+                }
+            });
+
+            // เช็คคลิกคุย NPC
+            npcs.forEach(n => {
+                let dist = Math.hypot(n.x - worldClickX, n.y - worldClickY);
+                if (dist < 30) {
+                    alert(`[ระบบ ${n.name}] ยินดีต้อนรับนักล่า ${playerData.name}! จงกำจัดมอนสเตอร์ในดินแดนนี้ให้สิ้นซาก!`);
+                }
+            });
+
+            if (!clickedMonster) {
+                targetPos = { x: worldClickX, y: worldClickY };
+            }
         });
 
         function startOnlineGame() {
@@ -184,12 +236,13 @@
                 name: name,
                 charClass: charClass,
                 color: color,
-                x: 1500 + Math.random() * 200 - 100,
-                y: 1500 + Math.random() * 200 - 100,
+                x: 1500 + Math.random() * 100 - 50,
+                y: 1500 + Math.random() * 100 - 50,
                 hp: 100,
                 maxHp: 100,
                 level: 1,
-                action: 'idle'
+                gold: 0,
+                exp: 0
             };
 
             document.getElementById('create-screen').style.display = 'none';
@@ -207,18 +260,13 @@
             window.set(playerRef, playerData);
             window.onDisconnect(playerRef).remove();
 
-            // ฟังข้อมูลผู้เล่นทั้งหมด
             const allPlayersRef = window.ref(window.db, 'players');
             window.onValue(allPlayersRef, (snapshot) => {
                 const data = snapshot.val();
-                if (data) {
-                    otherPlayers = data;
-                } else {
-                    otherPlayers = {};
-                }
+                if (data) otherPlayers = data;
+                else otherPlayers = {};
             });
 
-            // ฟังแชท
             const chatRef = window.ref(window.db, 'chats');
             window.onValue(chatRef, (snapshot) => {
                 const data = snapshot.val();
@@ -242,11 +290,7 @@
                 const text = input.value.trim();
                 if (text && playerData) {
                     const chatRef = window.ref(window.db, 'chats');
-                    window.push(chatRef, {
-                        name: playerData.name,
-                        text: text,
-                        time: Date.now()
-                    });
+                    window.push(chatRef, { name: playerData.name, text: text, time: Date.now() });
                     input.value = '';
                 }
             }
@@ -263,7 +307,6 @@
             if (keys['KeyA'] || keys['ArrowLeft']) { playerData.x -= speed; moved = true; targetPos = null; }
             if (keys['KeyD'] || keys['ArrowRight']) { playerData.x += speed; moved = true; targetPos = null; }
 
-            // เดินตามคลิก
             if (targetPos) {
                 let dx = targetPos.x - playerData.x;
                 let dy = targetPos.y - playerData.y;
@@ -277,11 +320,9 @@
                 }
             }
 
-            // ขอบเขตโลก
             playerData.x = Math.max(50, Math.min(WORLD_SIZE - 50, playerData.x));
             playerData.y = Math.max(50, Math.min(WORLD_SIZE - 50, playerData.y));
 
-            // ซิงก์ข้อมูลไป Firebase ทุกๆ 50ms เพื่อความลื่นไหล
             let now = Date.now();
             if (moved && (now - lastSyncTime > 50)) {
                 const playerRef = window.ref(window.db, 'players/' + myPlayerId);
@@ -299,7 +340,7 @@
             ctx.save();
             ctx.translate(canvas.width / 2 - playerData.x, canvas.height / 2 - playerData.y);
 
-            // วาดแผนที่กริดพื้นหลัง
+            // พื้นหลังกริด
             ctx.strokeStyle = '#1f2833';
             ctx.lineWidth = 2;
             let gridSize = 100;
@@ -310,20 +351,55 @@
                 ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(WORLD_SIZE, y); ctx.stroke();
             }
 
-            // วาดขอบเขตแผนที่
+            // ขอบเขตโลก
             ctx.strokeStyle = '#66fcf1';
             ctx.lineWidth = 5;
             ctx.strokeRect(0, 0, WORLD_SIZE, WORLD_SIZE);
 
+            // วาด NPC
+            npcs.forEach(n => {
+                ctx.fillStyle = n.color;
+                ctx.beginPath();
+                ctx.arc(n.x, n.y, 18, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = '#f1c40f';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(`⭐ ${n.name}`, n.x, n.y - 24);
+            });
+
+            // วาดมอนสเตอร์
+            monsters.forEach(m => {
+                ctx.fillStyle = m.color;
+                ctx.beginPath();
+                ctx.arc(m.x, m.y, m.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // เลือดมอนสเตอร์
+                ctx.fillStyle = 'red';
+                ctx.fillRect(m.x - 20, m.y - m.radius - 12, 40, 5);
+                ctx.fillStyle = 'green';
+                ctx.fillRect(m.x - 20, m.y - m.radius - 12, 40 * (m.hp / m.maxHp), 5);
+
+                ctx.fillStyle = '#fff';
+                ctx.font = '11px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(m.name, m.x, m.y - m.radius - 16);
+            });
+
             // วาดผู้เล่นทั้งหมด
             for (let id in otherPlayers) {
                 let p = otherPlayers[id];
-                
-                // วาดตัวละคร (วงกลมพร้อมออร่า)
                 ctx.save();
                 ctx.translate(p.x, p.y);
 
-                // เงาออร่าอาชีพ
                 ctx.beginPath();
                 ctx.arc(0, 0, 22, 0, Math.PI * 2);
                 ctx.fillStyle = p.color || '#66fcf1';
@@ -331,7 +407,6 @@
                 ctx.fill();
                 ctx.globalAlpha = 1.0;
 
-                // ตัวละครหลัก
                 ctx.beginPath();
                 ctx.arc(0, 0, 16, 0, Math.PI * 2);
                 ctx.fillStyle = p.color || '#66fcf1';
@@ -340,22 +415,12 @@
                 ctx.strokeStyle = '#ffffff';
                 ctx.stroke();
 
-                // ชื่อและเลเวล
                 ctx.fillStyle = '#ffffff';
                 ctx.font = 'bold 13px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.fillText(`${p.name} (Lv.${p.level || 1})`, 0, -26);
 
                 ctx.restore();
-            }
-
-            // วาดวงแหวนเป้าหมายคลิก
-            if (targetPos) {
-                ctx.strokeStyle = '#66fcf1';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.arc(targetPos.x, targetPos.y, 15, 0, Math.PI * 2);
-                ctx.stroke();
             }
 
             ctx.restore();
@@ -366,17 +431,20 @@
             miniCtx.fillRect(0, 0, minimapCanvas.width, minimapCanvas.height);
 
             if (!playerData) return;
-
             let scale = minimapCanvas.width / WORLD_SIZE;
 
-            // วาดผู้เล่นอื่นบนมินิแมป
+            // มอนสเตอร์บนมินิแมป
+            monsters.forEach(m => {
+                miniCtx.fillStyle = '#e74c3c';
+                miniCtx.fillRect(m.x * scale - 2, m.y * scale - 2, 4, 4);
+            });
+
+            // ผู้เล่นบนมินิแมป
             for (let id in otherPlayers) {
                 let p = otherPlayers[id];
-                let mx = p.x * scale;
-                let my = p.y * scale;
-                miniCtx.fillStyle = p.id === myPlayerId ? '#66fcf1' : '#e74c3c';
+                miniCtx.fillStyle = p.id === myPlayerId ? '#66fcf1' : '#f39c12';
                 miniCtx.beginPath();
-                miniCtx.arc(mx, my, p.id === myPlayerId ? 4 : 2.5, 0, Math.PI * 2);
+                miniCtx.arc(p.x * scale, p.y * scale, p.id === myPlayerId ? 4 : 2.5, 0, Math.PI * 2);
                 miniCtx.fill();
             }
         }
