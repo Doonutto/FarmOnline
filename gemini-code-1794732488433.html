@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ทำฟาร์มออนไลน์ FarmOnlinegames</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Kanit', sans-serif; box-sizing: border-box; user-select: none; }
+        body { background-color: #0d1117; color: #f0f6fc; margin: 0; padding: 0; min-height: 100vh; overflow-x: hidden; }
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(22, 27, 34, 0.92), rgba(13, 17, 23, 0.96));
+            border: 1px solid rgba(56, 139, 253, 0.3);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+        }
+        .retro-btn {
+            background: linear-gradient(180deg, #238636 0%, #2ea043 100%);
+            border: 1px solid #3fb950;
+            box-shadow: 0 4px 12px rgba(46, 160, 67, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transition: all 0.15s ease;
+        }
+        .retro-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .retro-btn:active { transform: translateY(1px); }
+        .blue-btn {
+            background: linear-gradient(180deg, #1f6feb 0%, #388bfd 100%);
+            border: 1px solid #58a6ff;
+            box-shadow: 0 4px 12px rgba(31, 111, 235, 0.4);
+        }
+        canvas { image-rendering: pixelated; image-rendering: crisp-edges; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center p-2 sm:p-4 min-h-screen">
+
+    <!-- ==================== AUTH / LOGIN & PIN SCREEN ==================== -->
+    <div id="auth-screen" class="glass-panel rounded-2xl w-full max-w-md p-6 space-y-5">
+        <div class="text-center space-y-1">
+            <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-green-500">
+                🌾 FarmingOnline
+            </h1>
+            <p class="text-xs text-slate-400">เข้าสู่ระบบด้วยชื่อบัญชีและรหัส PIN เพื่อเข้าเล่นฟาร์มออนไลน์</p>
+        </div>
+
+        <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-800">
+            <button type="button" id="auth-tab-login" class="flex-1 py-2 rounded-lg text-xs font-bold bg-emerald-600 text-white transition cursor-pointer">🔑 เข้าสู่ระบบ</button>
+            <button type="button" id="auth-tab-register" class="flex-1 py-2 rounded-lg text-xs font-bold text-slate-400 transition cursor-pointer">📝 สมัครสมาชิกใหม่</button>
+        </div>
+
+        <div class="space-y-3 text-sm">
+            <div>
+                <label class="block text-xs font-semibold text-emerald-300 mb-1">ชื่อบัญชีชาวสวน (ภาษาอังกฤษ/ตัวเลข 3-15 ตัว)</label>
+                <input type="text" id="auth-username" maxlength="15" placeholder="เช่น Farmer01" class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-400 rounded-xl px-4 py-2.5 text-white outline-none">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-emerald-300 mb-1">รหัส PIN ส่วนตัว (4-8 หลัก)</label>
+                <input type="password" id="auth-pin" maxlength="8" inputmode="numeric" placeholder="ระบุรหัส PIN" class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-400 rounded-xl px-4 py-2.5 text-white outline-none">
+            </div>
+
+            <div id="register-notice" class="hidden bg-emerald-950/60 border border-emerald-500/40 rounded-xl p-3 text-[11px] text-emerald-200 space-y-1">
+                <p class="font-bold">🎁 รางวัลต้อนรับชาวสวนใหม่:</p>
+                <p>• เข้าเล่นครั้งแรก รับทุนเริ่มต้น <b>500G + เมล็ดพันธุ์ 10 ชิ้น</b> ฟรีทันที!</p>
+                <p>• บัญชีรองบนเครื่องเดิมเริ่มต้นที่ <b>0G</b> เพื่อป้องกันการปั๊มเงิน</p>
+            </div>
+
+            <button id="btn-auth-submit" type="button" class="retro-btn w-full py-3 rounded-xl font-bold text-white text-base tracking-wide cursor-pointer">
+                🔑 เข้าสู่ระบบ
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== LOBBY SCREEN ==================== -->
+    <div id="lobby-screen" class="hidden glass-panel rounded-2xl w-full max-w-lg p-6 space-y-6">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+            <div>
+                <h1 class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-green-500">
+                    🌾 FarmingOnline
+                </h1>
+                <p class="text-xs text-slate-400 mt-0.5">
+                    ชาวสวน: <strong id="lobby-user-badge" class="text-white">-</strong> | กระเป๋าเงิน: <strong id="lobby-wallet-badge" class="text-amber-300">0G</strong>
+                </p>
+            </div>
+            <button id="btn-logout" type="button" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-xs text-slate-300 font-bold cursor-pointer">
+                ออกจากระบบ
+            </button>
+        </div>
+
+        <div class="space-y-4 text-sm">
+            <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-800">
+                <button type="button" id="tab-create" class="flex-1 py-2 rounded-lg text-xs font-bold bg-emerald-600 text-white transition cursor-pointer">🏡 สร้างฟาร์มใหม่ (Host)</button>
+                <button type="button" id="tab-join" class="flex-1 py-2 rounded-lg text-xs font-bold text-slate-400 transition cursor-pointer">🚪 เข้าร่วมฟาร์มเพื่อน</button>
+            </div>
+
+            <div id="section-create" class="space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-emerald-300 mb-1">หมายเลขฟาร์ม (Room ID)</label>
+                        <div class="flex gap-1.5">
+                            <input type="text" id="input-create-room-id" maxlength="8" placeholder="เช่น 7777" class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2 text-white outline-none font-mono text-xs">
+                            <button type="button" id="btn-random-id" class="px-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs text-emerald-300 cursor-pointer" title="สุ่มหมายเลข">🎲</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-emerald-300 mb-1">รหัสผ่านฟาร์ม (แนะนำ)</label>
+                        <input type="password" id="input-create-pass" maxlength="10" placeholder="ตั้งรหัสป้องกันคนนอก" class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2 text-white outline-none text-xs">
+                    </div>
+                </div>
+                <button id="btn-host-action" type="button" class="retro-btn w-full py-3 rounded-xl font-bold text-white text-base tracking-wide cursor-pointer">
+                    🚜 สร้างฟาร์มและเข้าสู่เกม (เป็น Host)
+                </button>
+            </div>
+
+            <div id="section-join" class="space-y-3 hidden">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-emerald-300 mb-1">หมายเลขฟาร์มที่ต้องการเข้า</label>
+                        <input type="text" id="input-join-room-id" maxlength="8" placeholder="ระบุเลขฟาร์ม..." class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2 text-white outline-none font-mono text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-emerald-300 mb-1">รหัสผ่านฟาร์ม</label>
+                        <input type="password" id="input-join-pass" maxlength="10" placeholder="รหัสผ่านห้อง" class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-400 rounded-xl px-3 py-2 text-white outline-none text-xs">
+                    </div>
+                </div>
+                <button id="btn-join-action" type="button" class="blue-btn w-full py-3 rounded-xl font-bold text-white text-base tracking-wide cursor-pointer">
+                    🚪 เข้าสู่ฟาร์มเพื่อน
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== GAME SCREEN ==================== -->
+    <div id="game-screen" class="hidden flex flex-col items-center w-full max-w-4xl space-y-2">
+        <div class="glass-panel w-full rounded-xl px-4 py-2 flex flex-wrap justify-between items-center text-xs sm:text-sm">
+            <div class="flex items-center gap-3">
+                <span id="hud-room" class="font-bold text-emerald-400">🏡 ฟาร์ม: #0000</span>
+                <span id="hud-money" class="text-amber-300 font-bold">💰 500G</span>
+                <span id="hud-time" class="text-sky-300">⏰ 06:00 (Day 1)</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span id="gamepad-status" class="text-[11px] text-slate-400">🎮 จอย: ไม่ได้เชื่อมต่อ</span>
+                <button id="btn-toggle-audio" type="button" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold text-emerald-400 transition cursor-pointer">🔊 เปิดเสียง</button>
+                <button id="btn-leave-game" type="button" class="px-3 py-1 bg-rose-600 hover:bg-rose-500 rounded-lg text-white font-bold transition cursor-pointer">
+                    🚪 ออกจากฟาร์ม
+                </button>
+            </div>
+        </div>
+
+        <div class="relative rounded-xl overflow-hidden border-2 border-emerald-500/50 shadow-2xl bg-emerald-950">
+            <canvas id="game-canvas" width="800" height="500" class="block w-full max-w-full h-auto"></canvas>
+            
+            <div class="absolute bottom-2 left-2 flex flex-col gap-1 sm:hidden">
+                <div class="flex justify-center"><button id="m-up" class="w-12 h-12 bg-slate-800/80 active:bg-emerald-600 text-white rounded-lg font-bold">⬆️</button></div>
+                <div class="flex gap-2">
+                    <button id="m-left" class="w-12 h-12 bg-slate-800/80 active:bg-emerald-600 text-white rounded-lg font-bold">⬅️</button>
+                    <button id="m-down" class="w-12 h-12 bg-slate-800/80 active:bg-emerald-600 text-white rounded-lg font-bold">⬇️</button>
+                    <button id="m-right" class="w-12 h-12 bg-slate-800/80 active:bg-emerald-600 text-white rounded-lg font-bold">➡️</button>
+                </div>
+            </div>
+            <div class="absolute bottom-2 right-2 flex flex-col gap-2 sm:hidden">
+                <button id="m-cycle" class="px-3 py-2 bg-slate-800/90 active:bg-sky-600 text-white rounded-xl text-xs font-bold shadow-lg">🔄 เปลี่ยนอุปกรณ์</button>
+                <button id="m-action" class="px-4 py-3 bg-emerald-600 active:bg-emerald-500 text-white rounded-xl font-bold shadow-lg">🛠️ ทำงาน</button>
+            </div>
+        </div>
+
+        <div class="glass-panel w-full rounded-xl p-3 flex flex-wrap justify-between items-center text-xs gap-2">
+            <div class="flex items-center gap-2">
+                <span class="text-slate-300 font-semibold">🛠️ เครื่องมือ:</span>
+                <div class="flex gap-1" id="tool-bar">
+                    <button data-tool="hoe" class="tool-btn px-3 py-1.5 rounded-lg font-bold bg-emerald-600 text-white transition cursor-pointer">จอบ</button>
+                    <button data-tool="water" class="tool-btn px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-300 transition cursor-pointer">บัวรดน้ำ</button>
+                    <button data-tool="seed" class="tool-btn px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-300 transition cursor-pointer">เมล็ดพันธุ์</button>
+                    <button data-tool="harvest" class="tool-btn px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-300 transition cursor-pointer">เก็บเกี่ยว</button>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 text-slate-300">
+                <span>🎒 เมล็ด: <strong id="inv-seed" class="text-emerald-400">10</strong></span>
+                <span>🥔 ผลผลิต: <strong id="inv-crop" class="text-amber-400">0</strong></span>
+                <span class="text-[11px] text-sky-400">📞 (เดินไปที่ตู้โทรศัพท์เพื่อสั่งซื้อ / กล่องส่งออกเพื่อขาย)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SHOP MODAL ==================== -->
+    <div id="shop-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+        <div class="glass-panel rounded-2xl w-full max-w-sm p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h2 class="text-lg font-bold text-sky-400">📞 ตู้โทรศัพท์สั่งซื้อสินค้า</h2>
+                <button id="btn-close-shop" type="button" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold text-slate-300 cursor-pointer">✕ วางสาย</button>
+            </div>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center bg-slate-900 p-3 rounded-xl border border-slate-800">
+                    <div>
+                        <span class="font-bold text-sm block text-white">🌱 เมล็ดหัวผักกาด (Turnip)</span>
+                        <span class="text-xs text-amber-300">ราคา: 20G / 5 เมล็ด</span>
+                    </div>
+                    <button id="btn-buy-seed" type="button" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl font-bold text-xs text-white transition cursor-pointer">สั่งซื้อ</button>
+                </div>
+            </div>
+            <div class="text-center text-xs text-slate-400 pt-2">
+                เงินของคุณ: <strong id="shop-player-money" class="text-amber-300">500G</strong>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-none"></div>
+
+    <script>
+        const assets = {
+            player: new Image(), ground: new Image(), house: new Image(),
+            shop: new Image(), bin: new Image(), grass: new Image(),
+            soil: new Image(), soilWater: new Image(), soilSeeded: new Image(),
+            crop: new Image(), cropReady: new Image()
+        };
+
+        Object.keys(assets).forEach(key => {
+            assets[key].onerror = () => { assets[key] = null; };
+        });
+
+        assets.player.src = 'Player01.png';
+        assets.ground.src = 'ground.png';
+        assets.house.src = 'house.png';
+        assets.shop.src = 'shop.png';
+        assets.bin.src = 'bin.png';
+        assets.grass.src = 'grass.png';
+        assets.soil.src = 'soil.png';
+        assets.soilWater.src = 'soil_water.png';
+        assets.soilSeeded.src = 'soil_seeded.png';
+        assets.crop.src = 'crop.png';
+        assets.cropReady.src = 'crop_ready.png';
+
+        function isImgReady(img) {
+            return img && img.complete && img.naturalWidth > 0;
+        }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDummyKeyForFarmingOnline999",
+            authDomain: "farming-online-app.firebaseapp.com",
+            databaseURL: "https://farmingonline-default-rtdb.asia-southeast1.firebasedatabase.app/",
+            projectId: "farming-online-app"
+        };
+
+        let db = null;
+        try {
+            if (typeof firebase !== 'undefined') {
+                if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+                db = firebase.database();
+            }
+        } catch (e) {}
+
+        let audioCtx = null;
+        let isAudioEnabled = false;
+        let bgmInterval = null;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playSound(type) {
+            if (!isAudioEnabled || !audioCtx) return;
+            try {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                let now = audioCtx.currentTime;
+
+                if (type === 'step') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(120, now);
+                    osc.frequency.exponentialRampToValueAtTime(40, now + 0.08);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+                    osc.start(now); osc.stop(now + 0.08);
+                } else if (type === 'hoe') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.linearRampToValueAtTime(80, now + 0.15);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now); osc.stop(now + 0.15);
+                } else if (type === 'water') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.linearRampToValueAtTime(600, now + 0.2);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now); osc.stop(now + 0.2);
+                } else if (type === 'seed' || type === 'buy') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.08);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now); osc.stop(now + 0.2);
+                } else if (type === 'harvest' || type === 'sell') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.setValueAtTime(554.37, now + 0.1);
+                    osc.frequency.setValueAtTime(659.25, now + 0.2);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now); osc.stop(now + 0.3);
+                }
+            } catch (e) {}
+        }
+
+        function startBGM() {
+            if (bgmInterval || !isAudioEnabled) return;
+            const melody = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63];
+            let index = 0;
+            bgmInterval = setInterval(() => {
+                if (!isAudioEnabled || !audioCtx) return;
+                try {
+                    let osc = audioCtx.createOscillator();
+                    let gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(melody[index], audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.4);
+                    index = (index + 1) % melody.length;
+                } catch(e) {}
+            }, 500);
+        }
+
+        function stopBGM() {
+            if (bgmInterval) { clearInterval(bgmInterval); bgmInterval = null; }
+        }
+
+        document.getElementById('btn-toggle-audio').onclick = () => {
+            initAudio();
+            isAudioEnabled = !isAudioEnabled;
+            const btn = document.getElementById('btn-toggle-audio');
+            if (isAudioEnabled) {
+                btn.textContent = '🔊 ปิดเสียง';
+                btn.className = "px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-bold text-white transition cursor-pointer";
+                startBGM();
+                showToast('🔊 เปิดระบบเสียงเรียบร้อย', 'text-emerald-300');
+            } else {
+                btn.textContent = '🔇 เปิดเสียง';
+                btn.className = "px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold text-emerald-400 transition cursor-pointer";
+                stopBGM();
+                showToast('🔇 ปิดระบบเสียงแล้ว', 'text-slate-300');
+            }
+        };
+
+        async function hashPIN(pin) {
+            const salted = "FARMING_ONLINE_SALT_" + pin;
+            if (window.crypto && window.crypto.subtle) {
+                try {
+                    const msgBuffer = new TextEncoder().encode(salted);
+                    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+                    const hashArray = Array.from(new Uint8Array(hashBuffer));
+                    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                } catch (e) {}
+            }
+            let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+            for (let i = 0; i < salted.length; i++) {
+                let ch = salted.charCodeAt(i);
+                h1 = Math.imul(h1 ^ ch, 2654435761);
+                h2 = Math.imul(h2 ^ ch, 1597334677);
+            }
+            return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(16);
+        }
+
+        function getDeviceFingerprint() {
+            let devId = localStorage.getItem('farming_device_id');
+            if (!devId) {
+                devId = 'DEV-' + Math.random().toString(36).substr(2, 12) + '-' + Date.now().toString(36);
+                localStorage.setItem('farming_device_id', devId);
+            }
+            return devId;
+        }
+
+        let authMode = 'login';
+        let currentAccount = null;
+
+        const authTabLogin = document.getElementById('auth-tab-login');
+        const authTabRegister = document.getElementById('auth-tab-register');
+        const registerNotice = document.getElementById('register-notice');
+        const btnAuthSubmit = document.getElementById('btn-auth-submit');
+
+        authTabLogin.onclick = () => {
+            authMode = 'login';
+            authTabLogin.className = "flex-1 py-2 rounded-lg text-xs font-bold bg-emerald-600 text-white transition cursor-pointer";
+            authTabRegister.className = "flex-1 py-2 rounded-lg text-xs font-bold text-slate-400 transition cursor-pointer";
+            registerNotice.classList.add('hidden');
+            btnAuthSubmit.textContent = "🔑 เข้าสู่ระบบชาวสวน";
+        };
+
+        authTabRegister.onclick = () => {
+            authMode = 'register';
+            authTabRegister.className = "flex-1 py-2 rounded-lg text-xs font-bold bg-emerald-600 text-white transition cursor-pointer";
+            authTabLogin.className = "flex-1 py-2 rounded-lg text-xs font-bold text-slate-400 transition cursor-pointer";
+            registerNotice.classList.remove('hidden');
+            btnAuthSubmit.textContent = "📝 สมัครสมาชิก & รับรางวัลเริ่มต้น";
+        };
+
+        btnAuthSubmit.onclick = async () => {
+            const rawUser = document.getElementById('auth-username').value.trim();
+            const pin = document.getElementById('auth-pin').value.trim();
+
+            if (!/^[a-zA-Z0-9_]{3,15}$/.test(rawUser)) {
+                showToast('⚠️ ชื่อบัญชีต้องเป็นภาษาอังกฤษหรือตัวเลข 3-15 ตัวอักษร', 'text-rose-400');
+                return;
+            }
+            if (pin.length < 4) {
+                showToast('⚠️ กรุณาระบุรหัส PIN อย่างน้อย 4 หลัก', 'text-rose-400');
+                return;
+            }
+
+            initAudio();
+            const accountKey = rawUser.toLowerCase();
+            const pinHash = await hashPIN(pin);
+            const deviceId = getDeviceFingerprint();
+
+            const fallbackLogin = () => {
+                const localClaimed = localStorage.getItem('farming_starter_claimed') === 'true';
+                const savedLocal = JSON.parse(localStorage.getItem(`farming_acc_${accountKey}`) || 'null');
+                if (savedLocal) {
+                    if (savedLocal.pinHash !== pinHash) {
+                        showToast('❌ รหัส PIN ไม่ถูกต้อง', 'text-rose-400');
+                        return;
+                    }
+                    currentAccount = savedLocal;
+                } else {
+                    const rewardMoney = localClaimed ? 0 : 500;
+                    const rewardSeeds = localClaimed ? 0 : 10;
+                    currentAccount = { username: rawUser, accountKey, pinHash, money: rewardMoney, seeds: rewardSeeds, crops: 0 };
+                    localStorage.setItem(`farming_acc_${accountKey}`, JSON.stringify(currentAccount));
+                    localStorage.setItem('farming_starter_claimed', 'true');
+                    if (rewardMoney > 0) {
+                        showToast('🎁 เข้าเล่นครั้งแรก! รับรางวัล 500G + เมล็ดพันธุ์ 10 ชิ้น', 'text-amber-300');
+                    }
+                }
+                enterLobby();
+            };
+
+            if (!db) { fallbackLogin(); return; }
+
+            try {
+                const accRef = db.ref(`accounts/${accountKey}`);
+                const snap = await accRef.once('value');
+
+                if (authMode === 'register') {
+                    if (snap.exists()) {
+                        showToast('❌ ชื่อบัญชีนี้มีผู้ใช้งานแล้ว', 'text-rose-400');
+                        return;
+                    }
+                    const deviceRef = db.ref(`claimedDevices/${deviceId}`);
+                    const deviceSnap = await deviceRef.once('value');
+                    const localClaimed = localStorage.getItem('farming_starter_claimed') === 'true';
+                    const isEligibleForStarter = !deviceSnap.exists() && !localClaimed;
+
+                    const initialMoney = isEligibleForStarter ? 500 : 0;
+                    const initialSeeds = isEligibleForStarter ? 10 : 0;
+
+                    const newAccData = {
+                        username: rawUser,
+                        pinHash,
+                        money: initialMoney,
+                        seeds: initialSeeds,
+                        crops: 0,
+                        starterClaimed: isEligibleForStarter,
+                        deviceId,
+                        createdAt: firebase.database.ServerValue.TIMESTAMP
+                    };
+
+                    await accRef.set(newAccData);
+                    if (isEligibleForStarter) {
+                        await deviceRef.set({ firstAccount: accountKey });
+                        localStorage.setItem('farming_starter_claimed', 'true');
+                        showToast('🎁 รางวัลเข้าเล่นครั้งแรก! รับ 500G + เมล็ดพันธุ์ 10 ชิ้น', 'text-amber-300');
+                    } else {
+                        showToast('📝 สมัครสำเร็จ!', 'text-emerald-300');
+                    }
+
+                    currentAccount = { username: rawUser, accountKey, money: initialMoney, seeds: initialSeeds, crops: 0 };
+                    localStorage.setItem(`farming_acc_${accountKey}`, JSON.stringify(currentAccount));
+                    enterLobby();
+                } else {
+                    if (!snap.exists()) {
+                        showToast('❌ ไม่พบบัญชีนี้ กรุณาสมัครสมาชิกก่อน', 'text-rose-400');
+                        return;
+                    }
+                    const data = snap.val();
+                    if (data.pinHash !== pinHash) {
+                        showToast('❌ รหัส PIN ไม่ถูกต้อง', 'text-rose-400');
+                        return;
+                    }
+                    currentAccount = {
+                        username: data.username,
+                        accountKey,
+                        money: Number(data.money) || 0,
+                        seeds: Number(data.seeds) || 0,
+                        crops: Number(data.crops) || 0
+                    };
+                    localStorage.setItem(`farming_acc_${accountKey}`, JSON.stringify(currentAccount));
+                    showToast(`👋 ยินดีต้อนรับคุณ ${currentAccount.username}`, 'text-emerald-300');
+                    enterLobby();
+                }
+            } catch (err) {
+                fallbackLogin();
+            }
+        };
+
+        function enterLobby() {
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('lobby-screen').classList.remove('hidden');
+            document.getElementById('lobby-user-badge').textContent = currentAccount.username;
+            document.getElementById('lobby-wallet-badge').textContent = `${currentAccount.money}G`;
+        }
+
+        document.getElementById('btn-logout').onclick = () => {
+            currentAccount = null;
+            document.getElementById('lobby-screen').classList.add('hidden');
+            document.getElementById('auth-screen').classList.remove('hidden');
+            showToast('ออกจากระบบเรียบร้อย', 'text-slate-300');
+        };
+
+        const tabCreate = document.getElementById('tab-create');
+        const tabJoin = document.getElementById('tab-join');
+        const sectionCreate = document.getElementById('section-create');
+        const sectionJoin = document.getElementById('section-join');
+
+        tabCreate.onclick = () => {
+            tabCreate.className = "flex-1 py-2 rounded-lg text-xs font-bold bg-emerald-600 text-white transition cursor-pointer";
+            tabJoin.className = "flex-1 py-2 rounded-lg text-xs font-bold text-slate-400 transition cursor-pointer";
+            sectionCreate.classList.remove('hidden'); sectionJoin.classList.add('hidden');
+        };
+        tabJoin.onclick = () => {
+            tabJoin.className = "flex-1 py-2 rounded-lg text-xs font-bold bg-emerald-600 text-white transition cursor-pointer";
+            tabCreate.className = "flex-1 py-2 rounded-lg text-xs font-bold text-slate-400 transition cursor-pointer";
+            sectionJoin.classList.remove('hidden'); sectionCreate.classList.add('hidden');
+        };
+
+        document.getElementById('btn-random-id').onclick = () => {
+            document.getElementById('input-create-room-id').value = Math.floor(1000 + Math.random() * 9000);
+        };
+        document.getElementById('input-create-room-id').value = Math.floor(1000 + Math.random() * 9000);
+
+        let gameConfig = { name: '', roomId: '', password: '', isHost: false };
+        let canvas, ctx;
+        let myPlayer = { id: '', name: '', x: 400, y: 350, speed: 2.5, dir: 'down', money: 500, seeds: 10, crops: 0, selectedTool: 'hoe' };
+        let otherPlayers = {};
+        let farmPlots = {};
+        let gameTime = 360;
+        let dayCount = 1;
+        let myPresenceRef = null;
+        let farmRef = null;
+        let isHostUser = false;
+        let isShopOpen = false;
+        let stepCounter = 0;
+        let gameLoopRunning = false;
+
+        const toolsList = ['hoe', 'water', 'seed', 'harvest'];
+
+        function setTool(toolName) {
+            myPlayer.selectedTool = toolName;
+            document.querySelectorAll('.tool-btn').forEach(btn => {
+                if (btn.getAttribute('data-tool') === toolName) {
+                    btn.className = "tool-btn px-3 py-1.5 rounded-lg font-bold bg-emerald-600 text-white transition cursor-pointer";
+                } else {
+                    btn.className = "tool-btn px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-300 transition cursor-pointer";
+                }
+            });
+        }
+
+        function cycleNextTool() {
+            let currentIndex = toolsList.indexOf(myPlayer.selectedTool);
+            let nextIndex = (currentIndex + 1) % toolsList.length;
+            setTool(toolsList[nextIndex]);
+            showToast(`🛠️ เปลี่ยนเครื่องมือ: ${getToolNameTH(toolsList[nextIndex])}`, 'text-emerald-300');
+        }
+
+        function getToolNameTH(tool) {
+            if (tool === 'hoe') return 'จอบ';
+            if (tool === 'water') return 'บัวรดน้ำ';
+            if (tool === 'seed') return 'เมล็ดพันธุ์';
+            if (tool === 'harvest') return 'เก็บเกี่ยว';
+            return '';
+        }
+
+        document.querySelectorAll('.tool-btn').forEach(btn => {
+            btn.onclick = (e) => setTool(e.target.getAttribute('data-tool'));
+        });
+
+        const shopModal = document.getElementById('shop-modal');
+        function openShop() {
+            isShopOpen = true;
+            document.getElementById('shop-player-money').textContent = `${myPlayer.money}G`;
+            shopModal.classList.remove('hidden');
+        }
+        function closeShop() {
+            isShopOpen = false;
+            shopModal.classList.add('hidden');
+            myPlayer.y = 125;
+        }
+
+        document.getElementById('btn-close-shop').onclick = () => closeShop();
+        document.getElementById('btn-buy-seed').onclick = () => {
+            initAudio();
+            if (myPlayer.money >= 20) {
+                myPlayer.money -= 20;
+                myPlayer.seeds += 5;
+                document.getElementById('shop-player-money').textContent = `${myPlayer.money}G`;
+                syncWalletToServer();
+                playSound('buy');
+                showToast('📞 สั่งซื้อเมล็ดพันธุ์สำเร็จ (+5 เมล็ด)', 'text-emerald-300');
+            } else {
+                showToast('❌ เงินไม่พอ (ต้องการ 20G)', 'text-rose-400');
+            }
+        };
+
+        const keys = {};
+        window.addEventListener('keydown', e => {
+            if (isShopOpen) return;
+            if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','Shift'].includes(e.key)) e.preventDefault();
+            keys[e.key] = true;
+            if (e.key === '1') setTool('hoe');
+            if (e.key === '2') setTool('water');
+            if (e.key === '3') setTool('seed');
+            if (e.key === '4') setTool('harvest');
+            if (e.key === ' ' || e.key === 'Enter') doAction();
+        });
+        window.addEventListener('keyup', e => { keys[e.key] = false; });
+
+        async function validateAndJoin(roomId, password, isHosting) {
+            if (!currentAccount) return;
+            if (!roomId) { showToast('⚠️ กรุณาระบุหมายเลขฟาร์ม', 'text-rose-400'); return; }
+            initAudio();
+
+            if (db) {
+                try {
+                    const roomSnap = await db.ref(`farms/${roomId}`).once('value');
+                    if (isHosting) {
+                        if (roomSnap.exists()) {
+                            const data = roomSnap.val();
+                            if (data.hostAccount && data.hostAccount !== currentAccount.accountKey) {
+                                showToast('❌ หมายเลขฟาร์มนี้มีเจ้าของแล้ว', 'text-rose-400');
+                                return;
+                            }
+                            if (data.password && data.password !== password) {
+                                showToast('❌ รหัสผ่านฟาร์มไม่ถูกต้อง', 'text-rose-400');
+                                return;
+                            }
+                        } else {
+                            await db.ref(`farms/${roomId}`).set({
+                                hostId: currentAccount.accountKey,
+                                hostAccount: currentAccount.accountKey,
+                                password: password || ""
+                            });
+                        }
+                    } else {
+                        if (!roomSnap.exists()) { showToast('❌ ไม่พบหมายเลขฟาร์มนี้', 'text-rose-400'); return; }
+                        const data = roomSnap.val();
+                        if (data.password && data.password !== password) {
+                            showToast('❌ รหัสผ่านฟาร์มไม่ถูกต้อง', 'text-rose-400');
+                            return;
+                        }
+                        if (data.hostAccount === currentAccount.accountKey) isHosting = true;
+                    }
+                } catch (e) {}
+            }
+
+            isHostUser = isHosting;
+            gameConfig = { name: currentAccount.username, roomId, password, isHost: isHosting };
+            startGameSession();
+        }
+
+        document.getElementById('btn-host-action').onclick = () => {
+            validateAndJoin(document.getElementById('input-create-room-id').value.trim(), document.getElementById('input-create-pass').value.trim(), true);
+        };
+        document.getElementById('btn-join-action').onclick = () => {
+            validateAndJoin(document.getElementById('input-join-room-id').value.trim(), document.getElementById('input-join-pass').value.trim(), false);
+        };
+
+        function startGameSession() {
+            document.getElementById('lobby-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+
+            myPlayer.id = currentAccount.accountKey;
+            myPlayer.name = currentAccount.username;
+            myPlayer.money = Number(currentAccount.money) || 0;
+            myPlayer.seeds = Number(currentAccount.seeds) || 0;
+            myPlayer.crops = Number(currentAccount.crops) || 0;
+            myPlayer.x = 400; myPlayer.y = 350;
+
+            document.getElementById('hud-room').textContent = `🏡 ฟาร์ม: #${gameConfig.roomId} ${isHostUser ? '(👑 เจ้าของ)' : ''}`;
+
+            canvas = document.getElementById('game-canvas');
+            ctx = canvas.getContext('2d');
+
+            if (db) {
+                try {
+                    farmRef = db.ref(`farms/${gameConfig.roomId}`);
+                    myPresenceRef = farmRef.child(`players/${myPlayer.id}`);
+                    myPresenceRef.set({ name: myPlayer.name, x: myPlayer.x, y: myPlayer.y, dir: 'down', isHost: isHostUser });
+                    myPresenceRef.onDisconnect().remove();
+
+                    farmRef.child('players').on('value', snapshot => { otherPlayers = snapshot.val() || {}; });
+                    farmRef.child('plots').on('value', snapshot => { farmPlots = snapshot.val() || {}; });
+                } catch (e) {}
+            }
+
+            if (!gameLoopRunning) {
+                gameLoopRunning = true;
+                requestAnimationFrame(gameLoop);
+            }
+            showToast(`🌾 ยินดีต้อนรับสู่ฟาร์ม #${gameConfig.roomId}`, 'text-emerald-400');
+        }
+
+        function syncWalletToServer() {
+            if (!currentAccount) return;
+            currentAccount.money = myPlayer.money;
+            currentAccount.seeds = myPlayer.seeds;
+            currentAccount.crops = myPlayer.crops;
+            localStorage.setItem(`farming_acc_${currentAccount.accountKey}`, JSON.stringify(currentAccount));
+
+            if (db) {
+                db.ref(`accounts/${currentAccount.accountKey}`).update({
+                    money: Math.max(0, Math.floor(myPlayer.money)),
+                    seeds: Math.max(0, Math.floor(myPlayer.seeds)),
+                    crops: Math.max(0, Math.floor(myPlayer.crops))
+                }).catch(() => {});
+            }
+        }
+
+        document.getElementById('btn-leave-game').onclick = () => {
+            syncWalletToServer();
+            if (myPresenceRef) myPresenceRef.remove();
+            if (farmRef) { farmRef.child('players').off(); farmRef.child('plots').off(); }
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('lobby-screen').classList.remove('hidden');
+            showToast('🚪 ออกจากฟาร์มเรียบร้อย', 'text-slate-300');
+        };
+
+        function gameLoop() {
+            if (!document.getElementById('game-screen').classList.contains('hidden')) {
+                update();
+                render();
+            }
+            requestAnimationFrame(gameLoop);
+        }
+
+        function update() {
+            if (isShopOpen) return;
+
+            let dx = 0, dy = 0, currentSpeed = myPlayer.speed;
+            if (keys['Shift'] || keys['ShiftLeft'] || keys['ShiftRight']) currentSpeed *= 1.6;
+
+            if (keys['ArrowUp'] || keys['w'] || keys['W']) { dy = -currentSpeed; myPlayer.dir = 'up'; }
+            if (keys['ArrowDown'] || keys['s'] || keys['S']) { dy = currentSpeed; myPlayer.dir = 'down'; }
+            if (keys['ArrowLeft'] || keys['a'] || keys['A']) { dx = -currentSpeed; myPlayer.dir = 'left'; }
+            if (keys['ArrowRight'] || keys['d'] || keys['D']) { dx = currentSpeed; myPlayer.dir = 'right'; }
+
+            const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+            const gp = gamepads[0];
+            if (gp) {
+                document.getElementById('gamepad-status').textContent = `🎮 จอย: เชื่อมต่อแล้ว`;
+                const axisX = gp.axes[0], axisY = gp.axes[1];
+                if (Math.abs(axisX) > 0.2) { dx = axisX * currentSpeed; myPlayer.dir = axisX > 0 ? 'right' : 'left'; }
+                if (Math.abs(axisY) > 0.2) { dy = axisY * currentSpeed; myPlayer.dir = axisY > 0 ? 'down' : 'up'; }
+
+                if (gp.buttons[0].pressed && !gp._buttonAPressed) { doAction(); gp._buttonAPressed = true; }
+                if (!gp.buttons[0].pressed) gp._buttonAPressed = false;
+
+                if (gp.buttons[5].pressed && !gp._buttonRBPressed) { cycleNextTool(); gp._buttonRBPressed = true; }
+                if (!gp.buttons[5].pressed) gp._buttonRBPressed = false;
+            } else {
+                document.getElementById('gamepad-status').textContent = `🎮 จอย: ไม่ได้เชื่อมต่อ`;
+            }
+
+            if (dx !== 0 || dy !== 0) {
+                stepCounter++;
+                if (stepCounter % 15 === 0) playSound('step');
+            }
+
+            let nextX = myPlayer.x + dx, nextY = myPlayer.y + dy;
+            nextX = Math.max(30, Math.min(770, nextX));
+            nextY = Math.max(30, Math.min(470, nextY));
+
+            // ปรับตัวเลขให้แคบลงอีก เพื่อให้ผู้เล่นเดินแนบชิดหรือทับขอบบ้านได้ใกล้ขึ้น
+            if (!(nextX + 10 > 60 && nextX - 10 < 160 && nextY + 10 > 50 && nextY - 10 < 110)) {
+                myPlayer.x = nextX;
+            }
+            if (!(myPlayer.x + 10 > 60 && nextX - 10 < 160 && nextY + 10 > 50 && nextY - 10 < 110)) {
+                myPlayer.y = nextY;
+            }
+			
+            // ตู้โทรศัพท์สั่งซื้อสินค้า
+            if (myPlayer.x + 10 > 260 && myPlayer.x - 10 < 280 && myPlayer.y + 10 > 70 && myPlayer.y - 10 < 110) {
+                if (!isShopOpen) openShop();
+            }
+
+            // กล่องส่งออก (ขายผลผลิต)
+            if (myPlayer.x + 10 > 670 && myPlayer.x - 10 < 750 && myPlayer.y + 10 > 30 && myPlayer.y - 10 < 90) {
+                if (myPlayer.crops > 0) {
+                    const sold = myPlayer.crops;
+                    const earned = sold * 50;
+                    myPlayer.crops = 0;
+                    myPlayer.money += earned;
+                    syncWalletToServer();
+                    playSound('sell');
+                    showToast(`📦 ขายผลผลิต ${sold} ชิ้น (+${earned}G)!`, 'text-amber-300');
+                }
+                myPlayer.y = Math.max(myPlayer.y, 100);
+            }
+
+            if (myPresenceRef && (dx !== 0 || dy !== 0)) {
+                myPresenceRef.update({ x: Math.round(myPlayer.x), y: Math.round(myPlayer.y), dir: myPlayer.dir });
+            }
+
+            gameTime += 0.15;
+            if (gameTime >= 1440) {
+                gameTime = 0; dayCount++;
+                Object.keys(farmPlots).forEach(k => {
+                    let p = farmPlots[k];
+                    if (p && p.crop === 1 && p.state === 2) {
+                        p.stage = Math.min(3, (p.stage || 1) + 1);
+                        p.state = 1; savePlot(k, p);
+                    }
+                });
+            }
+            let hours = Math.floor(gameTime / 60), mins = Math.floor(gameTime % 60);
+            document.getElementById('hud-time').textContent = `⏰ ${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')} (Day ${dayCount})`;
+            document.getElementById('hud-money').textContent = `💰 ${myPlayer.money}G`;
+            document.getElementById('inv-seed').textContent = myPlayer.seeds;
+            document.getElementById('inv-crop').textContent = myPlayer.crops;
+        }
+
+        function doAction() {
+            if (isShopOpen) return;
+            initAudio();
+            let tx = myPlayer.x, ty = myPlayer.y + 15;
+            if (myPlayer.dir === 'up') ty -= 30;
+            if (myPlayer.dir === 'down') ty += 30;
+            if (myPlayer.dir === 'left') tx -= 30;
+            if (myPlayer.dir === 'right') tx += 30;
+
+            let gridX = Math.floor((tx - 180) / 45);
+            let gridY = Math.floor((ty - 180) / 45);
+
+            if (gridX >= 0 && gridX < 10 && gridY >= 0 && gridY < 5) {
+                let plotKey = `${gridX}_${gridY}`;
+                let plot = farmPlots[plotKey] || { state: 0, crop: 0, stage: 0 };
+
+                if (myPlayer.selectedTool === 'hoe') {
+                    if (plot.state === 0) { plot.state = 1; playSound('hoe'); savePlot(plotKey, plot); }
+                } else if (myPlayer.selectedTool === 'water') {
+                    if (plot.state >= 1) { plot.state = 2; playSound('water'); savePlot(plotKey, plot); }
+                } else if (myPlayer.selectedTool === 'seed') {
+                    if (plot.state >= 1 && plot.crop === 0) {
+                        if (myPlayer.seeds <= 0) { showToast('⚠️ เมล็ดหมด! ไปซื้อที่ตู้โทรศัพท์', 'text-rose-400'); return; }
+                        myPlayer.seeds--;
+                        plot.crop = 1; plot.stage = 1;
+                        syncWalletToServer();
+                        playSound('seed'); savePlot(plotKey, plot);
+                        showToast('🌱 หยอดเมล็ดพันธุ์แล้ว (รดน้ำเพื่อให้โต)', 'text-emerald-300');
+                    }
+                } else if (myPlayer.selectedTool === 'harvest') {
+                    if (!isHostUser) { showToast('⚠️ เฉพาะเจ้าของฟาร์มเท่านั้นที่เก็บเกี่ยวได้!', 'text-rose-400'); return; }
+                    if (plot.crop === 1 && plot.stage >= 3) {
+                        plot.crop = 0; plot.stage = 0; plot.state = 1;
+                        myPlayer.crops++;
+                        syncWalletToServer();
+                        playSound('harvest'); savePlot(plotKey, plot);
+                        showToast('✨ เก็บเกี่ยวผลผลิตสำเร็จ (นำไปขายที่กล่องส่งออก)!', 'text-amber-300');
+                    }
+                }
+            }
+        }
+
+        function savePlot(key, data) {
+            farmPlots[key] = data;
+            if (db && farmRef) farmRef.child(`plots/${key}`).set(data);
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (isImgReady(assets.ground)) ctx.drawImage(assets.ground, 0, 0, canvas.width, canvas.height);
+            else { ctx.fillStyle = '#1b4d3e'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+
+            if (isImgReady(assets.house)) ctx.drawImage(assets.house, 20, 10, 200, 150);
+            else {
+                ctx.fillStyle = '#8b4513'; ctx.fillRect(40, 30, 200, 150);
+                ctx.fillStyle = '#d2b48c'; ctx.beginPath(); ctx.moveTo(30, 30); ctx.lineTo(110, -5); ctx.lineTo(190, 30); ctx.fill();
+            }
+            ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(70, 10, 80, 16);
+            ctx.fillStyle = '#fff'; ctx.font = '10px Kanit'; ctx.textAlign = 'center';
+            ctx.fillText('🏡 บ้านชาวสวน', 110, 22);
+
+            if (isImgReady(assets.shop)) ctx.drawImage(assets.shop, 200, 45, 130, 90);
+            else { ctx.fillStyle = '#DB9025'; ctx.fillRect(300, 100 , 300, 180); }
+            ctx.fillStyle = '#fff'; ctx.font = '10px Kanit'; ctx.textAlign = 'center';
+            ctx.fillText('📞 ร้านค้า', 237, 48);
+
+            if (isImgReady(assets.bin)) ctx.drawImage(assets.bin, 670, 30, 100, 70);
+            else { ctx.fillStyle = '#708090'; ctx.fillRect(670, 30, 60, 40); }
+            ctx.fillStyle = '#fff'; ctx.font = '10px Kanit'; ctx.textAlign = 'center';
+            ctx.fillText('📦 กล่องส่งออก', 710, 22);
+
+            for (let gx = 0; gx < 10; gx++) {
+                for (let gy = 0; gy < 5; gy++) {
+                    let px = 180 + gx * 45, py = 180 + gy * 45;
+                    let plotKey = `${gx}_${gy}`, plot = farmPlots[plotKey] || { state: 0, crop: 0, stage: 0 };
+
+                    if (plot.crop === 1 && plot.stage === 1 && isImgReady(assets.soilSeeded)) ctx.drawImage(assets.soilSeeded, px, py, 40, 40);
+                    else if (plot.state === 2 && isImgReady(assets.soilWater)) ctx.drawImage(assets.soilWater, px, py, 40, 40);
+                    else if (plot.state >= 1 && isImgReady(assets.soil)) ctx.drawImage(assets.soil, px, py, 40, 40);
+                    else if (plot.state === 0 && isImgReady(assets.grass)) ctx.drawImage(assets.grass, px, py, 40, 40);
+                    else {
+                        ctx.fillStyle = plot.state === 0 ? '#2d5a27' : (plot.state === 1 ? '#5c4033' : '#3d2314');
+                        ctx.fillRect(px, py, 40, 40);
+                    }
+                    ctx.strokeStyle = '#1e381b'; ctx.strokeRect(px, py, 40, 40);
+
+					//รูปทรงของเมล็ด
+                    if (plot.crop === 1) {
+                        if (plot.stage >= 3 && isImgReady(assets.cropReady)) ctx.drawImage(assets.cropReady, px + 2, py + 2, 36, 36);
+                        else if (plot.stage === 2 && isImgReady(assets.crop)) ctx.drawImage(assets.crop, px + 5, py + 5, 30, 30);
+                        else {
+                            ctx.fillStyle = plot.stage >= 3 ? '#ff6b6b' : '#9E9854'; //สีเม็ดตอนเต็มไว,ตอนลงปลูก
+                            ctx.beginPath(); ctx.arc(px + 20, py + 20, plot.stage >= 3 ? 12 : 8, 0, Math.PI*2); ctx.fill();
+                        }
+                    }
+                }
+            }
+
+            let allPlayers = { ...otherPlayers, [myPlayer.id]: myPlayer };
+            Object.values(allPlayers).forEach(p => {
+                let x = p.x || 400, y = p.y || 350;
+                ctx.fillStyle = 'rgba(0,0,0,0.35)';
+                ctx.beginPath(); ctx.ellipse(x, y + 16, 14, 6, 0, 0, Math.PI*2); ctx.fill();
+
+                if (isImgReady(assets.player)) ctx.drawImage(assets.player, x - 40, y - 64, 80, 80);
+                else {
+                    ctx.fillStyle = '#2ed573'; ctx.fillRect(x - 8, y - 6, 16, 20);
+                }
+
+                ctx.fillStyle = 'rgba(0,0,0,0.65)'; ctx.fillRect(x - 32, isImgReady(assets.player) ? y - 76 : y - 35, 64, 15);  //ป้ายชื่อ
+                ctx.fillStyle = '#ffffff'; ctx.font = '10px Kanit'; ctx.textAlign = 'center';
+                ctx.fillText((p.isHost ? '👑 ' : '') + (p.name || 'ชาวสวน'), x, isImgReady(assets.player) ? y - 65 : y - 24);
+            });
+        }
+
+        ['up','down','left','right'].forEach(dir => {
+            const btn = document.getElementById(`m-${dir}`);
+            const keyName = dir === 'up' ? 'ArrowUp' : dir === 'down' ? 'ArrowDown' : dir === 'left' ? 'ArrowLeft' : 'ArrowRight';
+            btn.ontouchstart = () => { if(!isShopOpen) keys[keyName] = true; };
+            btn.ontouchend = () => { keys[keyName] = false; };
+            btn.onmousedown = () => { if(!isShopOpen) keys[keyName] = true; };
+            btn.onmouseup = () => { keys[keyName] = false; };
+        });
+        document.getElementById('m-action').onclick = () => doAction();
+        document.getElementById('m-cycle').onclick = () => cycleNextTool();
+
+        function showToast(msg, colorClass) {
+            const container = document.getElementById('toast-container');
+            const div = document.createElement('div');
+            div.className = `glass-panel px-4 py-2 rounded-full text-xs font-bold ${colorClass} shadow-xl`;
+            div.textContent = msg; container.appendChild(div);
+            setTimeout(() => div.remove(), 2500);
+        }
+    </script>
+</body>
+</html>
