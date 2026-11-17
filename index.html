@@ -75,7 +75,7 @@
     </div>
 
     <!-- ==================== LOBBY SCREEN ==================== -->
-    <div id="lobby-screen" class="hidden glass-panel rounded-2xl w-full max-w-lg p-6 space-y-6">
+    <div id="lobby-screen" class="hidden glass-panel rounded-2xl w-full max-w-lg p-6 space-y-5">
         <div class="flex justify-between items-center border-b border-slate-800 pb-3">
             <div>
                 <h1 class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-green-500">
@@ -88,6 +88,42 @@
             <button id="btn-logout" type="button" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-xs text-slate-300 font-bold cursor-pointer">
                 ออกจากระบบ
             </button>
+        </div>
+
+        <!-- เลือกตัวละคร 4 แบบ (เด็กชาย 4 / เด็กหญิง 4) -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 space-y-3 text-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-emerald-300">👤 เลือกสไตล์ตัวละคร (ชาย 4 / หญิง 4)</span>
+                <span id="avatar-preview-status" class="text-[11px] text-sky-300 font-semibold">👦 เด็กชาย (แบบที่ 1)</span>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div class="w-16 h-16 rounded-xl bg-slate-950 border border-slate-700 flex items-center justify-center overflow-hidden shrink-0">
+                    <img id="avatar-preview-img" src="Player01.png" alt="Preview" class="w-14 h-14 object-contain" onerror="this.style.display='none'; document.getElementById('avatar-preview-fallback').style.display='block';">
+                    <span id="avatar-preview-fallback" class="hidden text-2xl">🧑‍🌾</span>
+                </div>
+                
+                <div class="flex-1 space-y-2">
+                    <div>
+                        <div class="text-[11px] text-sky-300 font-bold mb-1">👦 เด็กชาย (Boy 1-4):</div>
+                        <div class="grid grid-cols-4 gap-1.5" id="boy-buttons-container">
+                            <button type="button" data-avatar="boy1" class="avatar-btn py-1.5 rounded-lg text-xs font-bold bg-sky-600 text-white border border-sky-400 transition cursor-pointer">1</button>
+                            <button type="button" data-avatar="boy2" class="avatar-btn py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 transition cursor-pointer">2</button>
+                            <button type="button" data-avatar="boy3" class="avatar-btn py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 transition cursor-pointer">3</button>
+                            <button type="button" data-avatar="boy4" class="avatar-btn py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 transition cursor-pointer">4</button>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-[11px] text-pink-300 font-bold mb-1">👧 เด็กหญิง (Girl 1-4):</div>
+                        <div class="grid grid-cols-4 gap-1.5" id="girl-buttons-container">
+                            <button type="button" data-avatar="girl1" class="avatar-btn py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 transition cursor-pointer">1</button>
+                            <button type="button" data-avatar="girl2" class="avatar-btn py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 transition cursor-pointer">2</button>
+                            <button type="button" data-avatar="girl3" class="avatar-btn py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 transition cursor-pointer">3</button>
+                            <button type="button" data-avatar="girl4" class="avatar-btn py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 transition cursor-pointer">4</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="space-y-4 text-sm">
@@ -187,7 +223,7 @@
 
     <!-- ==================== SHOP MODAL ==================== -->
     <div id="shop-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-        <div class="glass-panel rounded-2xl w-full max-w-sm p-6 space-y-4">
+        <div class="glass-panel rounded-2xl max-w-sm w-full p-6 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h2 class="text-lg font-bold text-sky-400">📞 ตู้โทรศัพท์สั่งซื้อสินค้า</h2>
                 <button id="btn-close-shop" type="button" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold text-slate-300 cursor-pointer">✕ วางสาย</button>
@@ -210,6 +246,20 @@
     <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-none"></div>
 
     <script>
+        // =========================================================================
+        // กำหนดลิงก์รูปภาพตัวละครทั้ง 8 แบบ (เด็กชาย 4 แบบ / เด็กหญิง 4 แบบ) ที่นี่ครับ
+        // =========================================================================
+        const PLAYER_AVATAR_URLS = {
+            boy1:  'Player01.png', // <--- ลิงก์รูปเด็กชาย แบบที่ 1
+            boy2:  'Player01.png', // <--- ลิงก์รูปเด็กชาย แบบที่ 2
+            boy3:  'Player01.png', // <--- ลิงก์รูปเด็กชาย แบบที่ 3
+            boy4:  'Player01.png', // <--- ลิงก์รูปเด็กชาย แบบที่ 4
+            girl1: 'Player02.png', // <--- ลิงก์รูปเด็กหญิง แบบที่ 1
+            girl2: 'Player02.png', // <--- ลิงก์รูปเด็กหญิง แบบที่ 2
+            girl3: 'Player02.png', // <--- ลิงก์รูปเด็กหญิง แบบที่ 3
+            girl4: 'Player02.png'  // <--- ลิงก์รูปเด็กหญิง แบบที่ 4
+        };
+
         const assets = {
             player: new Image(), ground: new Image(), house: new Image(),
             shop: new Image(), bin: new Image(), grass: new Image(),
@@ -217,24 +267,39 @@
             crop: new Image(), cropReady: new Image()
         };
 
+        // โหลดรูปภาพตัวละครทั้งหมดล่วงหน้าเพื่อความลื่นไหล
+        const loadedAvatarImages = {};
+        Object.keys(PLAYER_AVATAR_URLS).forEach(key => {
+            const img = new Image();
+            img.src = PLAYER_AVATAR_URLS[key];
+            loadedAvatarImages[key] = img;
+        });
+
         Object.keys(assets).forEach(key => {
             assets[key].onerror = () => { assets[key] = null; };
         });
 
-        assets.player.src = 'https://raw.githubusercontent.com/Doonutto/FarmOnline/refs/heads/main/Player01.png';
-        assets.ground.src = 'https://raw.githubusercontent.com/Doonutto/FarmOnline/refs/heads/main/ground.png';
-        assets.house.src = 'https://raw.githubusercontent.com/Doonutto/FarmOnline/refs/heads/main/house.png';
-        assets.shop.src = 'https://raw.githubusercontent.com/Doonutto/FarmOnline/refs/heads/main/shop.png';
-        assets.bin.src = 'https://raw.githubusercontent.com/Doonutto/FarmOnline/refs/heads/main/bin.png';
-        assets.grass.src = 'https://raw.githubusercontent.com/Doonutto/FarmOnline/refs/heads/main/grass.png';
-        assets.soil.src = 'https://raw.githubusercontent.com/Doonutto/FarmOnline/refs/heads/main/soil.png';
-        assets.soilWater.src = 'https://raw.githubusercontent.com/Doonutto/FarmOnline/refs/heads/main/soil_water.png';
-        assets.soilSeeded.src = 'https://raw.githubusercontent.com/Doonutto/FarmOnline/refs/heads/main/soil_seeded.png';
-        assets.crop.src = 'https://raw.githubusercontent.com/Doonutto/FarmOnline/refs/heads/main/crop.png';
-        assets.cropReady.src = 'https://raw.githubusercontent.com/Doonutto/FarmOnline/refs/heads/main/crop_ready.png';
+        assets.player.src = PLAYER_AVATAR_URLS.boy1;
+        assets.ground.src = 'ground.png';
+        assets.house.src = 'house.png';
+        assets.shop.src = 'shop.png';
+        assets.bin.src = 'bin.png';
+        assets.grass.src = 'grass.png';
+        assets.soil.src = 'soil.png';
+        assets.soilWater.src = 'soil_water.png';
+        assets.soilSeeded.src = 'soil_seeded.png';
+        assets.crop.src = 'crop.png';
+        assets.cropReady.src = 'crop_ready.png';
 
         function isImgReady(img) {
             return img && img.complete && img.naturalWidth > 0;
+        }
+
+        function getPlayerSprite(avatarType) {
+            const targetImg = loadedAvatarImages[avatarType] || assets.player;
+            if (isImgReady(targetImg)) return targetImg;
+            if (isImgReady(assets.player)) return assets.player;
+            return null;
         }
 
         const firebaseConfig = {
@@ -431,11 +496,11 @@
                         showToast('❌ รหัส PIN ไม่ถูกต้อง', 'text-rose-400');
                         return;
                     }
-                    currentAccount = savedLocal;
+                    currentAccount = { avatar: 'boy1', ...savedLocal };
                 } else {
                     const rewardMoney = localClaimed ? 0 : 500;
                     const rewardSeeds = localClaimed ? 0 : 10;
-                    currentAccount = { username: rawUser, accountKey, pinHash, money: rewardMoney, seeds: rewardSeeds, crops: 0 };
+                    currentAccount = { username: rawUser, accountKey, pinHash, money: rewardMoney, seeds: rewardSeeds, crops: 0, avatar: 'boy1' };
                     localStorage.setItem(`farming_acc_${accountKey}`, JSON.stringify(currentAccount));
                     localStorage.setItem('farming_starter_claimed', 'true');
                     if (rewardMoney > 0) {
@@ -470,6 +535,7 @@
                         money: initialMoney,
                         seeds: initialSeeds,
                         crops: 0,
+                        avatar: 'boy1',
                         starterClaimed: isEligibleForStarter,
                         deviceId,
                         createdAt: firebase.database.ServerValue.TIMESTAMP
@@ -484,7 +550,7 @@
                         showToast('📝 สมัครสำเร็จ!', 'text-emerald-300');
                     }
 
-                    currentAccount = { username: rawUser, accountKey, money: initialMoney, seeds: initialSeeds, crops: 0 };
+                    currentAccount = { username: rawUser, accountKey, money: initialMoney, seeds: initialSeeds, crops: 0, avatar: 'boy1' };
                     localStorage.setItem(`farming_acc_${accountKey}`, JSON.stringify(currentAccount));
                     enterLobby();
                 } else {
@@ -502,7 +568,8 @@
                         accountKey,
                         money: Number(data.money) || 0,
                         seeds: Number(data.seeds) || 0,
-                        crops: Number(data.crops) || 0
+                        crops: Number(data.crops) || 0,
+                        avatar: data.avatar || 'boy1'
                     };
                     localStorage.setItem(`farming_acc_${accountKey}`, JSON.stringify(currentAccount));
                     showToast(`👋 ยินดีต้อนรับคุณ ${currentAccount.username}`, 'text-emerald-300');
@@ -513,11 +580,67 @@
             }
         };
 
+        // ==================== AVATAR SELECTION (4 BOYS / 4 GIRLS) ====================
+        const avatarPreviewImg = document.getElementById('avatar-preview-img');
+        const avatarPreviewFallback = document.getElementById('avatar-preview-fallback');
+        const avatarPreviewStatus = document.getElementById('avatar-preview-status');
+
+        function updateAvatarUI() {
+            if (!currentAccount) return;
+            const av = currentAccount.avatar || 'boy1';
+
+            // อัปเดตสถานะข้อความและรูปพรีวิว
+            if (av.startsWith('girl')) {
+                const num = av.replace('girl', '');
+                avatarPreviewStatus.textContent = `👧 เด็กหญิง (แบบที่ ${num})`;
+                avatarPreviewStatus.className = "text-[11px] text-pink-300 font-semibold";
+                avatarPreviewFallback.textContent = "👧";
+            } else {
+                const num = av.replace('boy', '');
+                avatarPreviewStatus.textContent = `👦 เด็กชาย (แบบที่ ${num})`;
+                avatarPreviewStatus.className = "text-[11px] text-sky-300 font-semibold";
+                avatarPreviewFallback.textContent = "👦";
+            }
+
+            avatarPreviewFallback.style.display = 'none';
+            avatarPreviewImg.style.display = 'block';
+            avatarPreviewImg.src = PLAYER_AVATAR_URLS[av] || PLAYER_AVATAR_URLS.boy1;
+
+            // ไฮไลต์ปุ่มที่เลือก
+            document.querySelectorAll('.avatar-btn').forEach(btn => {
+                const type = btn.getAttribute('data-avatar');
+                if (type === av) {
+                    if (type.startsWith('girl')) {
+                        btn.className = "avatar-btn py-1.5 rounded-lg text-xs font-bold bg-pink-600 text-white border border-pink-400 transition cursor-pointer shadow-md";
+                    } else {
+                        btn.className = "avatar-btn py-1.5 rounded-lg text-xs font-bold bg-sky-600 text-white border border-sky-400 transition cursor-pointer shadow-md";
+                    }
+                } else {
+                    btn.className = "avatar-btn py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700 transition cursor-pointer";
+                }
+            });
+        }
+
+        function saveAvatarChoice(avatarType) {
+            if (!currentAccount) return;
+            currentAccount.avatar = avatarType;
+            updateAvatarUI();
+            localStorage.setItem(`farming_acc_${currentAccount.accountKey}`, JSON.stringify(currentAccount));
+            if (db) {
+                db.ref(`accounts/${currentAccount.accountKey}`).update({ avatar: avatarType }).catch(() => {});
+            }
+        }
+
+        document.querySelectorAll('.avatar-btn').forEach(btn => {
+            btn.onclick = () => saveAvatarChoice(btn.getAttribute('data-avatar'));
+        });
+
         function enterLobby() {
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('lobby-screen').classList.remove('hidden');
             document.getElementById('lobby-user-badge').textContent = currentAccount.username;
             document.getElementById('lobby-wallet-badge').textContent = `${currentAccount.money}G`;
+            updateAvatarUI();
         }
 
         document.getElementById('btn-logout').onclick = () => {
@@ -550,7 +673,7 @@
 
         let gameConfig = { name: '', roomId: '', password: '', isHost: false };
         let canvas, ctx;
-        let myPlayer = { id: '', name: '', x: 400, y: 350, speed: 2.5, dir: 'down', money: 500, seeds: 10, crops: 0, selectedTool: 'hoe' };
+        let myPlayer = { id: '', name: '', x: 400, y: 350, speed: 2.5, dir: 'down', money: 500, seeds: 10, crops: 0, selectedTool: 'hoe', avatar: 'boy1' };
         let otherPlayers = {};
         let farmPlots = {};
         let gameTime = 360;
@@ -693,6 +816,7 @@
             myPlayer.money = Number(currentAccount.money) || 0;
             myPlayer.seeds = Number(currentAccount.seeds) || 0;
             myPlayer.crops = Number(currentAccount.crops) || 0;
+            myPlayer.avatar = currentAccount.avatar || 'boy1';
             myPlayer.x = 400; myPlayer.y = 350;
 
             document.getElementById('hud-room').textContent = `🏡 ฟาร์ม: #${gameConfig.roomId} ${isHostUser ? '(👑 เจ้าของ)' : ''}`;
@@ -704,7 +828,14 @@
                 try {
                     farmRef = db.ref(`farms/${gameConfig.roomId}`);
                     myPresenceRef = farmRef.child(`players/${myPlayer.id}`);
-                    myPresenceRef.set({ name: myPlayer.name, x: myPlayer.x, y: myPlayer.y, dir: 'down', isHost: isHostUser });
+                    myPresenceRef.set({
+                        name: myPlayer.name,
+                        x: myPlayer.x,
+                        y: myPlayer.y,
+                        dir: 'down',
+                        isHost: isHostUser,
+                        avatar: myPlayer.avatar
+                    });
                     myPresenceRef.onDisconnect().remove();
 
                     farmRef.child('players').on('value', snapshot => { otherPlayers = snapshot.val() || {}; });
@@ -741,6 +872,7 @@
             if (farmRef) { farmRef.child('players').off(); farmRef.child('plots').off(); }
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('lobby-screen').classList.remove('hidden');
+            document.getElementById('lobby-wallet-badge').textContent = `${myPlayer.money}G`;
             showToast('🚪 ออกจากฟาร์มเรียบร้อย', 'text-slate-300');
         };
 
@@ -789,7 +921,6 @@
             nextX = Math.max(30, Math.min(770, nextX));
             nextY = Math.max(30, Math.min(470, nextY));
 
-            // ปรับตัวเลขให้แคบลงอีก เพื่อให้ผู้เล่นเดินแนบชิดหรือทับขอบบ้านได้ใกล้ขึ้น
             if (!(nextX + 10 > 60 && nextX - 10 < 160 && nextY + 10 > 50 && nextY - 10 < 110)) {
                 myPlayer.x = nextX;
             }
@@ -797,12 +928,10 @@
                 myPlayer.y = nextY;
             }
 			
-            // ตู้โทรศัพท์สั่งซื้อสินค้า
             if (myPlayer.x + 10 > 260 && myPlayer.x - 10 < 280 && myPlayer.y + 10 > 70 && myPlayer.y - 10 < 110) {
                 if (!isShopOpen) openShop();
             }
 
-            // กล่องส่งออก (ขายผลผลิต)
             if (myPlayer.x + 10 > 670 && myPlayer.x - 10 < 750 && myPlayer.y + 10 > 30 && myPlayer.y - 10 < 90) {
                 if (myPlayer.crops > 0) {
                     const sold = myPlayer.crops;
@@ -817,7 +946,12 @@
             }
 
             if (myPresenceRef && (dx !== 0 || dy !== 0)) {
-                myPresenceRef.update({ x: Math.round(myPlayer.x), y: Math.round(myPlayer.y), dir: myPlayer.dir });
+                myPresenceRef.update({
+                    x: Math.round(myPlayer.x),
+                    y: Math.round(myPlayer.y),
+                    dir: myPlayer.dir,
+                    avatar: myPlayer.avatar
+                });
             }
 
             gameTime += 0.15;
@@ -925,12 +1059,11 @@
                     }
                     ctx.strokeStyle = '#1e381b'; ctx.strokeRect(px, py, 40, 40);
 
-					//รูปทรงของเมล็ด
                     if (plot.crop === 1) {
                         if (plot.stage >= 3 && isImgReady(assets.cropReady)) ctx.drawImage(assets.cropReady, px + 2, py + 2, 36, 36);
                         else if (plot.stage === 2 && isImgReady(assets.crop)) ctx.drawImage(assets.crop, px + 5, py + 5, 30, 30);
                         else {
-                            ctx.fillStyle = plot.stage >= 3 ? '#ff6b6b' : '#9E9854'; //สีเม็ดตอนเต็มไว,ตอนลงปลูก
+                            ctx.fillStyle = plot.stage >= 3 ? '#ff6b6b' : '#9E9854';
                             ctx.beginPath(); ctx.arc(px + 20, py + 20, plot.stage >= 3 ? 12 : 8, 0, Math.PI*2); ctx.fill();
                         }
                     }
@@ -940,17 +1073,22 @@
             let allPlayers = { ...otherPlayers, [myPlayer.id]: myPlayer };
             Object.values(allPlayers).forEach(p => {
                 let x = p.x || 400, y = p.y || 350;
+                const pAvatar = p.avatar || 'boy1';
+                const pSprite = getPlayerSprite(pAvatar);
+
                 ctx.fillStyle = 'rgba(0,0,0,0.35)';
                 ctx.beginPath(); ctx.ellipse(x, y + 16, 14, 6, 0, 0, Math.PI*2); ctx.fill();
 
-                if (isImgReady(assets.player)) ctx.drawImage(assets.player, x - 40, y - 64, 80, 80);
-                else {
-                    ctx.fillStyle = '#2ed573'; ctx.fillRect(x - 8, y - 6, 16, 20);
+                if (pSprite) {
+                    ctx.drawImage(pSprite, x - 40, y - 64, 80, 80);
+                } else {
+                    ctx.fillStyle = pAvatar.startsWith('girl') ? '#f472b6' : '#38bdf8';
+                    ctx.fillRect(x - 8, y - 6, 16, 20);
                 }
 
-                ctx.fillStyle = 'rgba(0,0,0,0.65)'; ctx.fillRect(x - 32, isImgReady(assets.player) ? y - 76 : y - 35, 64, 15);  //ป้ายชื่อ
+                ctx.fillStyle = 'rgba(0,0,0,0.65)'; ctx.fillRect(x - 32, pSprite ? y - 76 : y - 35, 64, 15);
                 ctx.fillStyle = '#ffffff'; ctx.font = '10px Kanit'; ctx.textAlign = 'center';
-                ctx.fillText((p.isHost ? '👑 ' : '') + (p.name || 'ชาวสวน'), x, isImgReady(assets.player) ? y - 65 : y - 24);
+                ctx.fillText((p.isHost ? '👑 ' : '') + (p.name || 'ชาวสวน'), x, pSprite ? y - 65 : y - 24);
             });
         }
 
