@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ทำฟาร์มออนไลน์ FarmOnlinegames</title>
+    <title>Doonutto ทำฟาร์มออนไลน์ FarmOnlinegames</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -90,7 +90,7 @@
             </button>
         </div>
 
-        <!-- เลือกตัวละคร 4 แบบ (เด็กชาย 4 / เด็กหญิง 4) -->
+        <!-- เลือกตัวละคร 4 แบบ (ชาย 4 / หญิง 4) -->
         <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4 space-y-3 text-sm">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-emerald-300">👤 เลือกสไตล์ตัวละคร (ชาย 4 / หญิง 4)</span>
@@ -178,6 +178,8 @@
                 <span id="hud-time" class="text-sky-300">⏰ 06:00 (Day 1)</span>
             </div>
             <div class="flex items-center gap-2">
+                <!-- ปุ่มสิทธิ์ให้เพื่อนช่วยเก็บเกี่ยว (เฉพาะ Host) -->
+                <button id="btn-toggle-coop" type="button" class="hidden px-2.5 py-1 bg-sky-600 hover:bg-sky-500 rounded-lg text-white font-bold transition cursor-pointer">⚙️ สิทธิ์เพื่อน: 👤</button>
                 <span id="gamepad-status" class="text-[11px] text-slate-400">🎮 จอย: ไม่ได้เชื่อมต่อ</span>
                 <button id="btn-toggle-audio" type="button" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold text-emerald-400 transition cursor-pointer">🔊 เปิดเสียง</button>
                 <button id="btn-leave-game" type="button" class="px-3 py-1 bg-rose-600 hover:bg-rose-500 rounded-lg text-white font-bold transition cursor-pointer">
@@ -247,7 +249,7 @@
 
     <script>
         // =========================================================================
-        // กำหนดลิงก์รูปภาพตัวละครทั้ง 8 แบบ (เด็กชาย 4 แบบ / เด็กหญิง 4 แบบ) ที่นี่ครับ
+        // กำหนดลิงก์รูปภาพตัวละครทั้ง 8 แบบ (เด็กชาย 4 แบบ / เด็กหญิง 4 แบบ)
         // =========================================================================
         const PLAYER_AVATAR_URLS = {
             boy1:  'Player01.png', // <--- ลิงก์รูปเด็กชาย แบบที่ 1
@@ -267,7 +269,6 @@
             crop: new Image(), cropReady: new Image()
         };
 
-        // โหลดรูปภาพตัวละครทั้งหมดล่วงหน้าเพื่อความลื่นไหล
         const loadedAvatarImages = {};
         Object.keys(PLAYER_AVATAR_URLS).forEach(key => {
             const img = new Image();
@@ -580,7 +581,7 @@
             }
         };
 
-        // ==================== AVATAR SELECTION (4 BOYS / 4 GIRLS) ====================
+        // ==================== AVATAR SELECTION ====================
         const avatarPreviewImg = document.getElementById('avatar-preview-img');
         const avatarPreviewFallback = document.getElementById('avatar-preview-fallback');
         const avatarPreviewStatus = document.getElementById('avatar-preview-status');
@@ -589,7 +590,6 @@
             if (!currentAccount) return;
             const av = currentAccount.avatar || 'boy1';
 
-            // อัปเดตสถานะข้อความและรูปพรีวิว
             if (av.startsWith('girl')) {
                 const num = av.replace('girl', '');
                 avatarPreviewStatus.textContent = `👧 เด็กหญิง (แบบที่ ${num})`;
@@ -606,7 +606,6 @@
             avatarPreviewImg.style.display = 'block';
             avatarPreviewImg.src = PLAYER_AVATAR_URLS[av] || PLAYER_AVATAR_URLS.boy1;
 
-            // ไฮไลต์ปุ่มที่เลือก
             document.querySelectorAll('.avatar-btn').forEach(btn => {
                 const type = btn.getAttribute('data-avatar');
                 if (type === av) {
@@ -676,6 +675,7 @@
         let myPlayer = { id: '', name: '', x: 400, y: 350, speed: 2.5, dir: 'down', money: 500, seeds: 10, crops: 0, selectedTool: 'hoe', avatar: 'boy1' };
         let otherPlayers = {};
         let farmPlots = {};
+        let farmSettings = { allowCoopHarvest: false };
         let gameTime = 360;
         let dayCount = 1;
         let myPresenceRef = null;
@@ -744,6 +744,34 @@
             }
         };
 
+        // ปุ่มสลับสิทธิ์เพื่อนช่วยเก็บเกี่ยว (เฉพาะ Host)
+        const btnToggleCoop = document.getElementById('btn-toggle-coop');
+        btnToggleCoop.onclick = () => {
+            if (!isHostUser) return;
+            initAudio();
+            farmSettings.allowCoopHarvest = !farmSettings.allowCoopHarvest;
+            updateCoopUI();
+            if (db && farmRef) {
+                farmRef.child('settings').set(farmSettings);
+            }
+            showToast(farmSettings.allowCoopHarvest ? '🔓 เปิดสิทธิ์ให้เพื่อนช่วยเก็บเกี่ยวแล้ว' : '🔒 ล็อกสิทธิ์เก็บเกี่ยวเฉพาะเจ้าของ', 'text-sky-300');
+        };
+
+        function updateCoopUI() {
+            if (isHostUser) {
+                btnToggleCoop.classList.remove('hidden');
+                if (farmSettings.allowCoopHarvest) {
+                    btnToggleCoop.textContent = '⚙️ สิทธิ์: 👥';
+                    btnToggleCoop.className = "px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-white font-bold transition cursor-pointer text-xs sm:text-sm";
+                } else {
+                    btnToggleCoop.textContent = '⚙️ สิทธิ์: 👤';
+                    btnToggleCoop.className = "px-2.5 py-1 bg-sky-600 hover:bg-sky-500 rounded-lg text-white font-bold transition cursor-pointer text-xs sm:text-sm";
+                }
+            } else {
+                btnToggleCoop.classList.add('hidden');
+            }
+        }
+
         const keys = {};
         window.addEventListener('keydown', e => {
             if (isShopOpen) return;
@@ -780,7 +808,8 @@
                             await db.ref(`farms/${roomId}`).set({
                                 hostId: currentAccount.accountKey,
                                 hostAccount: currentAccount.accountKey,
-                                password: password || ""
+                                password: password || "",
+                                settings: { allowCoopHarvest: false }
                             });
                         }
                     } else {
@@ -820,6 +849,7 @@
             myPlayer.x = 400; myPlayer.y = 350;
 
             document.getElementById('hud-room').textContent = `🏡 ฟาร์ม: #${gameConfig.roomId} ${isHostUser ? '(👑 เจ้าของ)' : ''}`;
+            updateCoopUI();
 
             canvas = document.getElementById('game-canvas');
             ctx = canvas.getContext('2d');
@@ -840,6 +870,13 @@
 
                     farmRef.child('players').on('value', snapshot => { otherPlayers = snapshot.val() || {}; });
                     farmRef.child('plots').on('value', snapshot => { farmPlots = snapshot.val() || {}; });
+                    farmRef.child('settings').on('value', snapshot => {
+                        const val = snapshot.val();
+                        if (val) {
+                            farmSettings = val;
+                            updateCoopUI();
+                        }
+                    });
                 } catch (e) {}
             }
 
@@ -869,7 +906,11 @@
         document.getElementById('btn-leave-game').onclick = () => {
             syncWalletToServer();
             if (myPresenceRef) myPresenceRef.remove();
-            if (farmRef) { farmRef.child('players').off(); farmRef.child('plots').off(); }
+            if (farmRef) {
+                farmRef.child('players').off();
+                farmRef.child('plots').off();
+                farmRef.child('settings').off();
+            }
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('lobby-screen').classList.remove('hidden');
             document.getElementById('lobby-wallet-badge').textContent = `${myPlayer.money}G`;
@@ -1002,7 +1043,11 @@
                         showToast('🌱 หยอดเมล็ดพันธุ์แล้ว (รดน้ำเพื่อให้โต)', 'text-emerald-300');
                     }
                 } else if (myPlayer.selectedTool === 'harvest') {
-                    if (!isHostUser) { showToast('⚠️ เฉพาะเจ้าของฟาร์มเท่านั้นที่เก็บเกี่ยวได้!', 'text-rose-400'); return; }
+                    // ตรวจสอบสิทธิ์การเก็บเกี่ยว (Host หรือเปิดอนุญาตให้เพื่อนช่วยเก็บได้)
+                    if (!isHostUser && !farmSettings.allowCoopHarvest) {
+                        showToast('⚠️ เจ้าของฟาร์มยังไม่เปิดสิทธิ์ให้เพื่อนเก็บเกี่ยว!', 'text-rose-400');
+                        return;
+                    }
                     if (plot.crop === 1 && plot.stage >= 3) {
                         plot.crop = 0; plot.stage = 0; plot.state = 1;
                         myPlayer.crops++;
